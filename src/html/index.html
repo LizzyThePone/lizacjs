@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Loading...</title>
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="../js/index.js"></script>
+</head>
+
+<body style="background: white;">
+    <div class="navbar">
+        <a onclick="openPanel('main')">Main</a>
+        <a onclick="openPanel('glow')">Glow</a>
+        <a onclick="openPanel('clantag')">Tag</a>
+        <!--a onclick="openPanel('skinchanger')">Skins</a-->
+    </div>
+</body>
+
+<div class="menupanel" id="main">
+    <p>
+        <input type="checkbox" id="triggerBox">
+        <label for="triggerBox">Triggerbot</label>
+    </p>
+    <p>
+        <input type="checkbox" id="bhopBox">
+        <label for="bhopBox">Bunnyhop</label>
+    </p>
+    <p>
+        <input type="checkbox" id="autostrafeBox">
+        <label for="autostrafeBox">Autostrafe</label>
+    </p>
+</div>
+
+<div class="menupanel" id="glow" hidden="true">
+    <p>
+        <input type="checkbox" id="glowBox">
+        <label for="glowBox">Glow main</label>
+    </p>
+
+    <h3 style="display: inline-block;">T color:</h3>
+    <input type="color" id="tColor" value="#ffa100" style="width:100px;text-align:right;" onchange="setTColor(this.value)">
+    <br>
+    <h3 style="display: inline-block;">CT color:</h3>
+    <input type="color" id="ctColor" value="#00a1ff" style="width:100px;text-align:right;" onchange="setCtColor(this.value)">
+</div>
+
+<div class="menupanel" id="clantag" hidden="true">
+    <div class="tagDiv">
+        <form class="tagbox" style="max-width:340px" onsubmit="return false;">
+            <input type="text" id="tagbox" placeholder="Clantag" name="set">
+            <button onclick="setClanTagButton()">   Set   </button>
+        </form>
+        <br>
+        <div>
+            <input id="staticTagBox" type="radio" name="user" value="Static">
+            <label for="staticTagBox"><span></span>Static</label>
+
+            <input id="scrollTagBox" type="radio" name="user" value="Scroll" checked="true">
+            <label for="scrollTagBox"><span></span>Scroll</label>
+
+            <input id="buildTagBox" type="radio" name="user" value="build">
+            <label for="buildTagBox"><span></span>Build</label>
+
+            <!--input id="gamesenseTagBox" type="radio" name="user" value="Static">
+            <label for="gamesenseTagBox"><span></span>gamesense</label-->
+        </div>
+        <br>
+        <div>
+            <input id="nlTagBox" type="checkbox" name="user" value="nl">
+            <label for="nlTagBox"><span></span>Add newline</label>
+        </div>
+        <h4 style="display: inline-block;">Interval:</h4>
+        <input type="number" id="tagintervalbox" value="750" min="250" style="width: 60px; "> ms
+        <br><br>
+        <p id="tagDisplay" style="text-align: center;"></p>
+    </div>
+
+</div>
+
+<div class="menupanel" id="skinchanger" hidden="true">
+
+</div>
+
+</html>
