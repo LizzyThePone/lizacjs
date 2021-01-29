@@ -10,35 +10,6 @@
 
 Memory* Mem;
 
-struct Vec3 {
-	float x, y, z;
-
-	Vec3 operator+(Vec3 d) {
-		return { x + d.x, y + d.y, z + d.z };
-	}
-	Vec3 operator-(Vec3 d) {
-		return { x - d.x, y - d.y, z - d.z };
-	}
-	Vec3 operator*(float d) {
-		return { x * d, y * d, z * d };
-	}
-
-	void Normalize() {
-		while (y < -180) {
-			y += 360;
-		};
-		while (y > 180) {
-			y -= 360;
-		};
-		if (x > 89) {
-			x = 89;
-		};
-		if (x < -89) {
-			x = -89;
-		};
-	}
-};
-
 struct GlowColor {
 	float r, g, b, a;
 };
@@ -46,6 +17,35 @@ struct GlowColor {
 struct GlowSettings {
     bool renderWhenOccluded, renderWhenUnoccluded, fullBloom;
 };
+
+struct Vec3 {
+		float x, y, z;
+
+		Vec3 operator+(Vec3 d) {
+			return { x + d.x, y + d.y, z + d.z };
+		}
+		Vec3 operator-(Vec3 d) {
+			return { x - d.x, y - d.y, z - d.z };
+		}
+		Vec3 operator*(float d) {
+			return { x * d, y * d, z * d };
+		}
+
+		void Normalize() {
+			while (y < -180) {
+				y += 360;
+			};
+			while (y > 180) {
+				y -= 360;
+			};
+			if (x > 89) {
+				x = 89;
+			};
+			if (x < -89) {
+				x = -89;
+			};
+		}
+	};
 
 bool TriggerToggled = false;
 
@@ -175,6 +175,96 @@ void Glow()
                 }
             }
         }
+        Sleep(2);
+    }
+}
+
+
+bool RadarToggled = false;
+
+void Radar()
+{
+    while (true) {
+        if (!RadarToggled) {
+            Sleep(100);
+        }
+
+        else if (RadarToggled)
+        {
+            for (int i = 0; i < Mem->Read<int>(Mem->ClientDLLBase + hazedumper::signatures::dwGlowObjectManager + 0xC); i++){
+                if (!RadarToggled) break;
+                Mem->Write<bool>(GetEntity(i) + hazedumper::netvars::m_bSpotted, true);
+            }
+        }
+
+        Sleep(50);
+    }
+}
+
+bool NoflashToggled = false;
+
+void Noflash()
+{
+    while (true) {
+        if (!NoflashToggled) {
+            Sleep(100);
+        }
+
+        else if (NoflashToggled)
+        {
+            DWORD LocalPlayer = Mem->Read<DWORD>(Mem->ClientDLLBase + hazedumper::signatures::dwLocalPlayer);
+            float FlashAlpha = Mem->Read<float>(LocalPlayer + hazedumper::netvars::m_flFlashMaxAlpha);
+            float FlashDuration = Mem->Read<float>(LocalPlayer + hazedumper::netvars::m_flFlashDuration);
+
+            if (FlashAlpha != 0.f || FlashDuration != 0.f)
+            {
+                Mem->Write<float>(LocalPlayer + hazedumper::netvars::m_flFlashMaxAlpha, 0.f);
+                Mem->Write<float>(LocalPlayer + hazedumper::netvars::m_flFlashDuration, 0.f);
+            }
+        }
+
+        Sleep(10);
+    }
+}
+
+bool RCSToggled = false;
+bool RCSReset = false;
+Vec3 OriginAngles = {0,0,0};
+
+void RCS()
+{
+    while (true) {
+        if (!RCSToggled) {
+            Sleep(100);
+        }
+
+        else if (RCSToggled)
+        {
+            DWORD LocalPlayer = Mem->Read<DWORD>(Mem->ClientDLLBase + hazedumper::signatures::dwLocalPlayer);
+            int ShotsFired = Mem->Read<int>(LocalPlayer + hazedumper::netvars::m_iShotsFired);
+
+            if (ShotsFired >= 1)
+            {
+                Vec3 VPunch = Mem->Read<Vec3>(LocalPlayer + hazedumper::netvars::m_aimPunchAngle);
+                DWORD ClientState = Mem->Read<DWORD>(Mem->EngineDLLBase + hazedumper::signatures::dwClientState);
+                Vec3 CurrentAngles = Mem->Read<Vec3>(ClientState + hazedumper::signatures::dwClientState_ViewAngles);
+                Vec3 NewAngles = CurrentAngles;
+                NewAngles.x = ((CurrentAngles.x + OriginAngles.x) - (VPunch.x * 2.f) );
+                NewAngles.y = ((CurrentAngles.y + OriginAngles.y) - (VPunch.y * 2.f) );
+
+                OriginAngles.x = VPunch.x * 2;
+                OriginAngles.y = VPunch.y * 2;
+
+                NewAngles.Normalize();
+                if (ShotsFired >= 2)
+                {
+                    Mem->Write<Vec3>(ClientState + hazedumper::signatures::dwClientState_ViewAngles, NewAngles);
+                }
+
+            }
+        }
+
+        Sleep(25);
     }
 }
 
@@ -257,18 +347,6 @@ void command(const char* command)
 	CloseHandle(hThread);
 }
 
-Napi::Value InitCheat(const Napi::CallbackInfo& args) {
-    Napi::Env env = args.Env();
-	Mem = new Memory();
-	
-	std::thread (Autostrafe).detach();
-    std::thread (Trigger).detach();
-    std::thread (Bhop).detach();
-    std::thread (Glow).detach();
-	
-    return env.Null();
-}
-
 Napi::Value ToggleTrigger(const Napi::CallbackInfo& args) {
 	Napi::Env env = args.Env();
   	if (!args[0].IsBoolean()) {
@@ -325,6 +403,48 @@ Napi::Value ToggleGlow(const Napi::CallbackInfo& args) {
 	return v;
 }
 
+Napi::Value ToggleRadar(const Napi::CallbackInfo& args) {
+	Napi::Env env = args.Env();
+  	if (!args[0].IsBoolean()) {
+        Napi::Error::New(env, "Invalid Arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    RadarToggled = args[0].As<Napi::Boolean>();
+
+    Napi::Boolean v = Napi::Boolean::New(env, RadarToggled);
+
+	return v;
+}
+
+Napi::Value ToggleNoflash(const Napi::CallbackInfo& args) {
+	Napi::Env env = args.Env();
+  	if (!args[0].IsBoolean()) {
+        Napi::Error::New(env, "Invalid Arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    NoflashToggled = args[0].As<Napi::Boolean>();
+
+    Napi::Boolean v = Napi::Boolean::New(env, NoflashToggled);
+
+	return v;
+}
+
+Napi::Value ToggleRCS(const Napi::CallbackInfo& args) {
+	Napi::Env env = args.Env();
+  	if (!args[0].IsBoolean()) {
+        Napi::Error::New(env, "Invalid Arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    RCSToggled = args[0].As<Napi::Boolean>();
+
+    Napi::Boolean v = Napi::Boolean::New(env, RCSToggled);
+
+	return v;
+}
+
 Napi::Value SetTColor(const Napi::CallbackInfo& args) {
 	Napi::Env env = args.Env();
   	if (!args[0].IsNumber() || !args[1].IsNumber() || !args[2].IsNumber() ) {
@@ -375,6 +495,21 @@ Napi::Value Thingy(const Napi::CallbackInfo& args) {
   	return num;
 }
 
+Napi::Value InitCheat(const Napi::CallbackInfo& args) {
+    Napi::Env env = args.Env();
+	Mem = new Memory();
+	
+	std::thread (Autostrafe).detach();
+    std::thread (Noflash).detach();
+    std::thread (Trigger).detach();
+    std::thread (Radar).detach();
+    std::thread (Bhop).detach();
+    std::thread (Glow).detach();
+    std::thread (RCS).detach();
+	
+    return env.Null();
+}
+
 Napi::Object init(Napi::Env env, Napi::Object exports) {
   	exports.Set(Napi::String::New(env, "initialize"), Napi::Function::New(env, InitCheat));
 
@@ -382,6 +517,9 @@ Napi::Object init(Napi::Env env, Napi::Object exports) {
     exports.Set(Napi::String::New(env, "toggleBhop"), Napi::Function::New(env, ToggleBhop));
     exports.Set(Napi::String::New(env, "toggleAutostrafe"), Napi::Function::New(env, ToggleAutostrafe));
     exports.Set(Napi::String::New(env, "toggleGlow"), Napi::Function::New(env, ToggleGlow));
+    exports.Set(Napi::String::New(env, "toggleRadar"), Napi::Function::New(env, ToggleRadar));
+    exports.Set(Napi::String::New(env, "toggleNoflash"), Napi::Function::New(env, ToggleNoflash));
+    exports.Set(Napi::String::New(env, "toggleRCS"), Napi::Function::New(env, ToggleRCS));
 
     exports.Set(Napi::String::New(env, "setTColor"), Napi::Function::New(env, SetTColor));
     exports.Set(Napi::String::New(env, "setCtColor"), Napi::Function::New(env, SetCtColor));
@@ -392,4 +530,4 @@ Napi::Object init(Napi::Env env, Napi::Object exports) {
   	return exports;
 }
 
-NODE_API_MODULE(lizzyjs, init)
+NODE_API_MODULE(lizac, init)

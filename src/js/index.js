@@ -20,7 +20,13 @@ window.addEventListener('DOMContentLoaded', () => {
         lizac.toggleTrigger(event.currentTarget.checked)
     })
 
-    lizac.toggleTrigger(document.getElementById('triggerBox').checked)
+    lizac.toggleTrigger(document.getElementById('rcsBox').checked)
+
+    document.getElementById('rcsBox').addEventListener('change', (event) => {
+        lizac.toggleRCS(event.currentTarget.checked)
+    })
+
+    lizac.toggleRCS(document.getElementById('triggerBox').checked)
 
     document.getElementById('bhopBox').addEventListener('change', (event) => {
         lizac.toggleBhop(event.currentTarget.checked)
@@ -34,6 +40,18 @@ window.addEventListener('DOMContentLoaded', () => {
 
     lizac.toggleAutostrafe(document.getElementById('autostrafeBox').checked)
 
+    document.getElementById('radarBox').addEventListener('change', (event) => {
+        lizac.toggleRadar(event.currentTarget.checked)
+    })
+
+    lizac.toggleRadar(document.getElementById('radarBox').checked)
+
+    document.getElementById('noflashBox').addEventListener('change', (event) => {
+        lizac.toggleNoflash(event.currentTarget.checked)
+    })
+
+    lizac.toggleNoflash(document.getElementById('noflashBox').checked)
+
     document.getElementById('glowBox').addEventListener('change', (event) => {
         lizac.toggleGlow(event.currentTarget.checked)
     })
@@ -43,7 +61,6 @@ window.addEventListener('DOMContentLoaded', () => {
     setTColor(document.getElementById('tColor').value)
     setCtColor(document.getElementById('ctColor').value)
 })
-
 
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
