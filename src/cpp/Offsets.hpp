@@ -1,10 +1,10 @@
 #pragma once
 #include <cstdint>
 
-// 2021-01-28 08:19:25.446521 UTC
+// 2021-01-29 00:54:45.802299900 UTC
 
 namespace hazedumper {
-constexpr ::std::int64_t timestamp = 1611821965;
+constexpr ::std::int64_t timestamp = 1611881685;
 namespace netvars {
 constexpr ::std::ptrdiff_t cs_gamerules_data = 0x0;
 constexpr ::std::ptrdiff_t m_ArmorValue = 0xB378;
@@ -65,8 +65,8 @@ constexpr ::std::ptrdiff_t m_iClip1 = 0x3264;
 constexpr ::std::ptrdiff_t m_iCompetitiveRanking = 0x1A84;
 constexpr ::std::ptrdiff_t m_iCompetitiveWins = 0x1B88;
 constexpr ::std::ptrdiff_t m_iCrosshairId = 0xB3E4;
-constexpr ::std::ptrdiff_t m_iDefaultFOV = 0x332C;
 constexpr ::std::ptrdiff_t m_iEntityQuality = 0x2FAC;
+constexpr ::std::ptrdiff_t m_iFOV = 0x31E4;
 constexpr ::std::ptrdiff_t m_iFOVStart = 0x31E8;
 constexpr ::std::ptrdiff_t m_iGlowIndex = 0xA438;
 constexpr ::std::ptrdiff_t m_iHealth = 0x100;
@@ -138,7 +138,7 @@ constexpr ::std::ptrdiff_t dwYawPtr = 0xD8FAC0;
 constexpr ::std::ptrdiff_t dwZoomSensitivityRatioPtr = 0xD94D60;
 constexpr ::std::ptrdiff_t dwbSendPackets = 0xD73EA;
 constexpr ::std::ptrdiff_t dwppDirect3DDevice9 = 0xA7050;
-constexpr ::std::ptrdiff_t find_hud_element = 0x2804E320;
+constexpr ::std::ptrdiff_t find_hud_element = 0x3B0CE320;
 constexpr ::std::ptrdiff_t force_update_spectator_glow = 0x3AD962;
 constexpr ::std::ptrdiff_t interface_engine_cvar = 0x3E9EC;
 constexpr ::std::ptrdiff_t is_c4_owner = 0x3BA430;

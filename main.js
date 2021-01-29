@@ -7,7 +7,7 @@ const fs = require('fs');
 
 const file = fs.createWriteStream("src/cpp/offsets.hpp");
 console.log("Downloading offsets.hpp from github...")
-fetch('https://raw.githubusercontent.com/frk1/hazedumper/master/csgo.hpp')
+fetch('https://raw.githubusercontent.com/LizzyThePone/lizacjs/master/src/cpp/Offsets.hpp')
     .then(res => res.body.pipe(file).on('finish', function() {
         console.log("Done!")
         console.log("Rebuilding dependancies...")
@@ -20,7 +20,7 @@ fetch('https://raw.githubusercontent.com/frk1/hazedumper/master/csgo.hpp')
                 console.log(`stderr: ${stderr}`);
                 return;
             }
-            console.log(`stdout: ${stdout}`);
+            console.log(`${stdout}`);
         }).on("close", code => {
             if (code == 0) {
                 function createWindow() {
