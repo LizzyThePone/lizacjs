@@ -1,12 +1,16 @@
 #include <Windows.h>
 #include <TlHelp32.h>
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <thread>
 #include <napi.h>
+#include <map>
 
 #include "Memory.h"
 #include "Offsets.hpp"
+
+#define PI 3.1415927f
 
 Memory* Mem;
 
@@ -19,33 +23,108 @@ struct GlowSettings {
 };
 
 struct Vec3 {
-		float x, y, z;
+	float x, y, z;
 
-		Vec3 operator+(Vec3 d) {
-			return { x + d.x, y + d.y, z + d.z };
-		}
-		Vec3 operator-(Vec3 d) {
-			return { x - d.x, y - d.y, z - d.z };
-		}
-		Vec3 operator*(float d) {
-			return { x * d, y * d, z * d };
-		}
+    Vec3() { x = y = z = 0; }
+	Vec3(const float x, const float y, const float z) : x(x), y(y), z(z) {}
+    Vec3 operator + (const Vec3& rhs) const { return Vec3(x + rhs.x, y + rhs.y, z + rhs.z); }
+    Vec3 operator - (const Vec3& rhs) const { return Vec3(x - rhs.x, y - rhs.y, z - rhs.z); }
+    Vec3 operator * (const float& rhs) const { return Vec3(x * rhs, y * rhs, z * rhs); }
+    Vec3 operator / (const float& rhs) const { return Vec3(x / rhs, y / rhs, z / rhs); }
+    Vec3& operator += (const Vec3& rhs) { return *this = *this + rhs; }
+    Vec3& operator -= (const Vec3& rhs) { return *this = *this - rhs; }
+    Vec3& operator *= (const float& rhs) { return *this = *this * rhs; }
+    Vec3& operator /= (const float& rhs) { return *this = *this / rhs; }
+    float dot() const { return x * x + y * y + z * z; }
+    float Length() const { return sqrtf(dot()); }
+    float Distance(const Vec3& rhs) const { return (*this - rhs).Length(); }
 
-		void Normalize() {
-			while (y < -180) {
-				y += 360;
-			};
-			while (y > 180) {
-				y -= 360;
-			};
-			if (x > 89) {
-				x = 89;
-			};
-			if (x < -89) {
-				x = -89;
-			};
-		}
-	};
+	void Normalize() {
+		while (y < -180) {
+			y += 360;
+		};
+		while (y > 180) {
+			y -= 360;
+		};
+		if (x > 89) {
+			x = 89;
+		};
+		if (x < -89) {
+			x = -89;
+		};
+	}
+
+};
+
+Vec3 Subtract(Vec3 src, Vec3 dst)
+{
+    Vec3 diff;
+    diff.x = src.x - dst.x;
+    diff.y = src.y - dst.y;
+    diff.z = src.z - dst.z;
+    return diff;
+}
+
+struct SkinObject {
+    int kit, stattrak, seed;
+    float wear;
+};
+
+std::map<int, SkinObject> Skins { {7, {3,0,0,0.f} } };
+
+float Magnitude(Vec3 vec)
+{
+    return sqrtf(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z);
+};
+
+float Distance(Vec3 src, Vec3 dst)
+{
+    Vec3 diff = Subtract(src, dst);
+    return Magnitude(diff);
+};
+
+Vec3 CalcAngle(Vec3 src, Vec3 dst)
+{
+    Vec3 vForward = dst - src;
+    Vec3 vAngle;
+
+    if (vForward.y == 0 && vForward.x == 0)
+    {
+        vAngle.y = 0;
+        if (vForward.z > 0)
+            vAngle.x = 270;
+        else 
+            vAngle.x = 90;
+    }
+    else
+    {
+        vAngle.y = (atan2(vForward.y, vForward.x) * 180 / PI);
+
+        if (vAngle.y < 0)
+            vAngle.y += 360;
+
+        float dotproduct  = sqrt(vForward.x * vForward.x + vForward.y * vForward.y);
+        vAngle.x = (atan2(-vForward.z, dotproduct) * 180 / PI);
+
+        if (vAngle.x < 0)
+            vAngle.x += 360;
+    }
+
+    vAngle.z = 0;
+
+    return vAngle;
+}
+
+
+
+Vec3 RadToDeg(Vec3& radians)
+{
+    Vec3 degrees =  {0,0,0};
+    degrees.x = radians.x * (180 / PI);
+    degrees.y = radians.y * (180 / PI);
+    degrees.z = radians.z * (180 / PI);
+    return degrees;
+};
 
 bool TriggerToggled = false;
 
@@ -74,6 +153,54 @@ void Trigger()
                 Sleep(25);
             }
         }
+    }
+}
+
+bool AimToggled = true;
+
+// Please no booly i am stoopid
+void Aim()
+{
+    while (true)
+    {
+
+        if (!AimToggled || !GetAsyncKeyState(VK_XBUTTON2)) {
+            Sleep(100);
+        }
+
+        else if (AimToggled && GetAsyncKeyState(VK_XBUTTON2)){
+            DWORD LocalPlayer_Base = Mem->Read<DWORD>(Mem->ClientDLLBase + hazedumper::signatures::dwLocalPlayer);
+            DWORD ClientState = Mem->Read<DWORD>(Mem->EngineDLLBase + hazedumper::signatures::dwClientState);
+            Vec3 CurrentAngles = Mem->Read<Vec3>(ClientState + hazedumper::signatures::dwClientState_ViewAngles);
+            int LocalPlayer_inCross = Mem->Read<int>(LocalPlayer_Base + hazedumper::netvars::m_iCrosshairId);
+            int LocalPlayer_Team = Mem->Read<int>(LocalPlayer_Base + hazedumper::netvars::m_iTeamNum);
+            DWORD Trigger_EntityBase = Mem->Read<DWORD>(Mem->ClientDLLBase + hazedumper::signatures::dwEntityList + ((LocalPlayer_inCross - 1) * 0x10));
+            int Trigger_EntityTeam = Mem->Read<int>(Trigger_EntityBase + hazedumper::netvars::m_iTeamNum);
+            bool Trigger_EntityDormant = Mem->Read<bool>(Trigger_EntityBase + hazedumper::signatures::m_bDormant);
+            DWORD BoneMatrix = Mem->Read<DWORD>(Trigger_EntityBase + hazedumper::netvars::m_dwBoneMatrix);
+            Vec3 VecOrigin = Mem->Read<Vec3>(LocalPlayer_Base + hazedumper::netvars::m_vecOrigin);
+            Vec3 ViewOffset = Mem->Read<Vec3>(LocalPlayer_Base + hazedumper::netvars::m_vecViewOffset);
+
+            Vec3 HeadPos = {0,0,0};
+            HeadPos.x = Mem->Read<float>(BoneMatrix + 0x30 * 8 + 0x0C);
+            HeadPos.y = Mem->Read<float>(BoneMatrix + 0x30 * 8 + 0x1C);
+            HeadPos.z = Mem->Read<float>(BoneMatrix + 0x30 * 8 + 0x2C);
+            Vec3 EyePos = VecOrigin;
+            EyePos.z = EyePos.z - ViewOffset.z;
+
+            Vec3 NewAngles = CalcAngle(EyePos, HeadPos);
+            NewAngles += CurrentAngles;
+
+            if ((LocalPlayer_inCross > 0 && LocalPlayer_inCross <= 64) && (Trigger_EntityBase != NULL) && (Trigger_EntityTeam != LocalPlayer_Team) && (!Trigger_EntityDormant))
+            {
+                std::cout << "x:" << HeadPos.x << " y:" << HeadPos.y << "z:" << HeadPos.z <<std::endl;
+                Mem->Write<Vec3>(ClientState + hazedumper::signatures::dwClientState_ViewAngles, NewAngles);
+                Mem->Write<int>(Mem->ClientDLLBase + hazedumper::signatures::dwForceAttack, 5);
+                Sleep(10);
+                Mem->Write<int>(Mem->ClientDLLBase + hazedumper::signatures::dwForceAttack, 4);
+            }
+        }
+        Sleep(10);
     }
 }
 
@@ -268,6 +395,65 @@ void RCS()
     }
 }
 
+bool SkinsToggled = false;
+bool ForceUpdate = false;
+
+void SkinChanger()
+{
+    while (true) {
+        if (!SkinsToggled) {
+            Sleep(100);
+        }
+
+        else if (SkinsToggled)
+        {
+            DWORD LocalPlayer = Mem->Read<DWORD>(Mem->ClientDLLBase + hazedumper::signatures::dwLocalPlayer);
+            DWORD ClientState = Mem->Read<DWORD>(Mem->EngineDLLBase + hazedumper::signatures::dwClientState);
+
+            for (int i = 0; i <= 5; i++){
+                int WeaponEnt = Mem->Read<int>(LocalPlayer + hazedumper::netvars::m_hMyWeapons + i * 0x04) & 0xFFF;
+                DWORD WeaponBase = Mem->Read<DWORD>(Mem->ClientDLLBase + hazedumper::signatures::dwEntityList + (WeaponEnt - 1) * 0x10);
+                int WeaponId = Mem->Read<short>(WeaponBase + hazedumper::netvars::m_iItemDefinitionIndex);
+                int AccountId = Mem->Read<int>(WeaponBase + hazedumper::netvars::m_OriginalOwnerXuidLow);
+                int ItemIdHigh = Mem->Read<int>(WeaponBase + hazedumper::netvars::m_iItemIDHigh);
+                int CurrentKit = Mem->Read<int>(WeaponBase + hazedumper::netvars::m_nFallbackPaintKit);
+                //std::cout << WeaponId << std::endl;
+                if (Skins.find(WeaponId) != Skins.end()) {
+                    SkinObject Skin = Skins[WeaponId];
+
+                    Mem->Write<int>(WeaponBase + hazedumper::netvars::m_OriginalOwnerXuidHigh, 0);
+                    Mem->Write<int>(WeaponBase + hazedumper::netvars::m_OriginalOwnerXuidLow, 0);
+                    Mem->Write<int>(WeaponBase + hazedumper::netvars::m_nFallbackPaintKit, Skin.kit);
+                    Mem->Write<int>(WeaponBase + hazedumper::netvars::m_nFallbackSeed, Skin.seed);
+                    Mem->Write<float>(WeaponBase + hazedumper::netvars::m_flFallbackWear, Skin.wear);
+                    Mem->Write<int>(WeaponBase + hazedumper::netvars::m_iAccountID, AccountId);
+
+                    if (Skin.kit != CurrentKit) {
+                        ForceUpdate = true;
+                    }
+
+                    if (Skin.stattrak != 0) {
+                        Mem->Write<int>(WeaponBase + hazedumper::netvars::m_nFallbackStatTrak, Skin.stattrak);
+                    }
+
+                    if (ItemIdHigh != -1) {
+                        Mem->Write<int>(WeaponBase + hazedumper::netvars::m_iItemIDHigh, -1);
+                    }
+
+                }
+            }
+            
+            if (ForceUpdate) {
+                Mem->Write<int>(ClientState + hazedumper::signatures::clientstate_delta_ticks, -1);
+                ForceUpdate = false;
+                Sleep(100);
+            }
+        }
+
+        Sleep(10);
+    }
+}
+
 Napi::Value SetClanTag(const Napi::CallbackInfo& args) {
   Napi::Env env = args.Env();
   if (!args[0].IsString()) {
@@ -445,6 +631,20 @@ Napi::Value ToggleRCS(const Napi::CallbackInfo& args) {
 	return v;
 }
 
+Napi::Value ToggleSkins(const Napi::CallbackInfo& args) {
+	Napi::Env env = args.Env();
+  	if (!args[0].IsBoolean()) {
+        Napi::Error::New(env, "Invalid Arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    SkinsToggled = args[0].As<Napi::Boolean>();
+
+    Napi::Boolean v = Napi::Boolean::New(env, SkinsToggled);
+
+	return v;
+}
+
 Napi::Value SetTColor(const Napi::CallbackInfo& args) {
 	Napi::Env env = args.Env();
   	if (!args[0].IsNumber() || !args[1].IsNumber() || !args[2].IsNumber() ) {
@@ -479,6 +679,7 @@ Napi::Value SetCtColor(const Napi::CallbackInfo& args) {
 	return env.Null();
 }
 
+
 Napi::Value Thingy(const Napi::CallbackInfo& args) {
 	Napi::Env env = args.Env();
     updateClientCmd();
@@ -495,16 +696,41 @@ Napi::Value Thingy(const Napi::CallbackInfo& args) {
   	return num;
 }
 
+Napi::Value SetSkin(const Napi::CallbackInfo& args) {
+    Napi::Env env = args.Env();
+
+    if (!args[0].IsNumber() || !args[1].IsNumber() || !args[2].IsNumber() || !args[3].IsNumber() || !args[4].IsNumber() ) {
+        Napi::Error::New(env, "Invalid Arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    SkinObject Skin;
+
+    int id = args[0].As<Napi::Number>().Int32Value();
+    Skin.kit = args[1].As<Napi::Number>().Int32Value();
+    Skin.seed = args[2].As<Napi::Number>().Int32Value();
+    Skin.wear = args[3].As<Napi::Number>().FloatValue();
+    Skin.stattrak = args[4].As<Napi::Number>().Int32Value();
+
+    Skins[id] = Skin;
+
+    
+    Napi::Boolean bitchbool = Napi::Boolean::New(env, (Skins.find(id) == Skins.end()) ? false : true);
+    return bitchbool;
+}
+
 Napi::Value InitCheat(const Napi::CallbackInfo& args) {
     Napi::Env env = args.Env();
 	Mem = new Memory();
 	
+    std::thread (SkinChanger).detach();
 	std::thread (Autostrafe).detach();
     std::thread (Noflash).detach();
     std::thread (Trigger).detach();
     std::thread (Radar).detach();
     std::thread (Bhop).detach();
     std::thread (Glow).detach();
+    //std::thread (Aim).detach();
     std::thread (RCS).detach();
 	
     return env.Null();
@@ -519,15 +745,17 @@ Napi::Object init(Napi::Env env, Napi::Object exports) {
     exports.Set(Napi::String::New(env, "toggleGlow"), Napi::Function::New(env, ToggleGlow));
     exports.Set(Napi::String::New(env, "toggleRadar"), Napi::Function::New(env, ToggleRadar));
     exports.Set(Napi::String::New(env, "toggleNoflash"), Napi::Function::New(env, ToggleNoflash));
-    exports.Set(Napi::String::New(env, "toggleRCS"), Napi::Function::New(env, ToggleRCS));
+    exports.Set(Napi::String::New(env, "toggleRCS"), Napi::Function::New(env, ToggleRCS));\
+    exports.Set(Napi::String::New(env, "toggleSkins"), Napi::Function::New(env, ToggleSkins));
 
     exports.Set(Napi::String::New(env, "setTColor"), Napi::Function::New(env, SetTColor));
     exports.Set(Napi::String::New(env, "setCtColor"), Napi::Function::New(env, SetCtColor));
     exports.Set(Napi::String::New(env, "setClanTag"), Napi::Function::New(env, SetClanTag));
+    exports.Set(Napi::String::New(env, "setSkin"), Napi::Function::New(env, SetSkin));
 
     exports.Set(Napi::String::New(env, "thingy"), Napi::Function::New(env, Thingy));
 
   	return exports;
 }
 
-NODE_API_MODULE(lizac, init)
+NODE_API_MODULE(lizzyjs, init)

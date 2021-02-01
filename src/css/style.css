@@ -23,6 +23,7 @@ body {
 .menupanel {
     padding-top: 50px;
     padding-left: 20px;
+    padding-right: 20px;
 }
 
 .navbar {
@@ -35,10 +36,9 @@ body {
 
 .navbar a {
     float: left;
-    display: block;
     color: #f2f2f2;
     text-align: center;
-    padding: 14px 16px;
+    padding: 14px 0;
     text-decoration: none;
     font-size: 17px;
     width: 25%;
@@ -193,4 +193,20 @@ form.tagbox button {
     border-left-width: 0;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+}
+
+.setskins {
+    float: right;
+    width: 50px;
+    height: 30px;
+    padding: 6px;
+    border-top: 25px;
+    background: #7289DA;
+    border-top: 25px;
+    color: white;
+    font-size: 16px;
+    border: 1px solid #7289DA;
+    border-left: none;
+    cursor: pointer;
+    border-radius: 4px;
 }

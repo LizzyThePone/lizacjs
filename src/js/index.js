@@ -1,6 +1,9 @@
 const lizac = require("../../build/Release/lizac.node")
+const weaponMap = require("../js/weapons")
+const skinMap = require("../js/skins")
 
-document.title = "Lizac v0.1 (pre-alpha)"
+
+document.title = "Lizac v0.9 (beta)"
 
 let openPanel = panel => {
     for (let x of document.getElementsByClassName("menupanel")) {
@@ -11,7 +14,6 @@ let openPanel = panel => {
         }
     }
 }
-
 
 window.addEventListener('DOMContentLoaded', () => {
     lizac.initialize()
@@ -58,8 +60,29 @@ window.addEventListener('DOMContentLoaded', () => {
 
     lizac.toggleGlow(document.getElementById('glowBox').checked)
 
+    document.getElementById('skinBox').addEventListener('change', (event) => {
+        lizac.toggleSkins(event.currentTarget.checked)
+    })
+
+    lizac.toggleSkins(document.getElementById('skinBox').checked)
+
     setTColor(document.getElementById('tColor').value)
     setCtColor(document.getElementById('ctColor').value)
+
+    document.getElementById('kitNameBox').onkeydown = filterSkins
+
+    weaponMap.forEach((v, k) => {
+        document.getElementById("gunlist").innerHTML = document.getElementById("gunlist").innerHTML + `<option class="gunItem" onclick="setGun()" id="gun${k}"> ${v.name} </option>`
+    })
+
+    skinMap.forEach((v, k) => {
+        if (v.name == "None") {
+            document.getElementById("skinlist").innerHTML = document.getElementById("skinlist").innerHTML + `<option class="skinItem" onclick="setSkin()" id="skin${k}" selected="true"> ${v.name} </option>`
+        } else {
+            document.getElementById("skinlist").innerHTML = document.getElementById("skinlist").innerHTML + `<option class="skinItem" onclick="setSkin()" id="skin${k}"> ${v.name} </option>`
+        }
+
+    })
 })
 
 function hexToRgb(hex) {
@@ -120,10 +143,95 @@ function setClanTagButton() {
 function setClanTag(tag) {
     if (tag != setTag) {
         let append = document.getElementById('nlTagBox').checked ? " \n" : ""
-        console.log(tag + append)
+        let prepend = document.getElementById('backwardsTagBox').checked ? "\u202E" : ""
+        console.log(prepend + tag + append)
 
-        lizac.setClanTag(tag + append)
+        lizac.setClanTag(prepend + tag + append)
         setTag = tag
     }
     document.getElementById('tagDisplay').innerHTML = tag
+}
+
+let setGun = () => {
+    let selectedWeaponId = parseInt(document.getElementById('gunlist').options[document.getElementById('gunlist').selectedIndex].id.replace('gun', ""))
+    let weapon = weaponMap.get(selectedWeaponId)
+    if (weapon.kit) {
+        document.getElementById('skinlist').options[document.getElementById('skinlist').selectedIndex].selected = false
+        document.getElementById(`skin${weapon.kit}`).selected = true
+        document.getElementById('seedBox').value = weapon.seed
+        document.getElementById('stattrakBox').value = weapon.stattrak
+        document.getElementById('kitBox').value = weapon.kit
+        document.getElementById('kitNameBox').value = document.getElementById(`skin${weapon.kit}`).innerHTML.trim()
+    } else {
+        document.getElementById('skinlist').options[document.getElementById('skinlist').selectedIndex].selected = false
+        document.getElementById(`skin0`).selected = true
+        document.getElementById('seedBox').value = 0
+        document.getElementById('stattrakBox').value = 0
+        document.getElementById('kitBox').value = 0
+        document.getElementById('kitNameBox').value = document.getElementById(`skin0`).innerHTML.trim()
+    }
+    weaponMap.set(selectedWeaponId, weapon)
+}
+
+let setSkin = () => {
+    let selectedWeaponId = parseInt(document.getElementById('gunlist').options[document.getElementById('gunlist').selectedIndex].id.replace('gun', ""))
+    let selectedSkinId = parseInt(document.getElementById('skinlist').options[document.getElementById('skinlist').selectedIndex].id.replace('skin', ""))
+    let weapon = weaponMap.get(selectedWeaponId)
+    weapon.kit = selectedSkinId
+    weapon.seed = (document.getElementById('seedBox').value == "") ? 0 : parseInt(document.getElementById('seedBox').value)
+    weapon.stattrak = (document.getElementById('stattrakBox').value == "") ? 0 : parseInt(document.getElementById('stattrakBox').value)
+    document.getElementById('kitBox').value = weapon.kit
+    document.getElementById('kitNameBox').value = document.getElementById(`skin${weapon.kit}`).innerHTML.trim()
+
+    weaponMap.set(selectedWeaponId, weapon)
+    lizac.setSkin(selectedWeaponId, selectedSkinId, weapon.seed, 0.0, weapon.stattrak)
+}
+
+let filterSkins = e => {
+    let search = document.getElementById('kitNameBox').value.toLocaleLowerCase()
+
+    if ((e.code.startsWith('Key') || e.code.startsWith('Digit') || e.code.startsWith('Numpad')) && e.code != "NumpadEnter") {
+        search += e.key
+    } else if (e.code == "Backspace") {
+        search = search.slice(0, -1)
+    }
+
+
+    if (search == "fuck") {
+        fuck()
+    }
+
+    for (let x of document.getElementsByClassName("skinItem")) {
+        if (x.innerHTML.trim().toLocaleLowerCase().includes(search)) {
+            x.hidden = false;
+        } else {
+            x.hidden = true;
+        }
+    }
+}
+
+async function pop() {
+    var audio = new Audio('https://cdn.discordapp.com/attachments/383187113912303616/805915173101240340/balloon_pop_cute.wav');
+    audio.type = 'audio/wav';
+    audio.volume = .1;
+
+    try {
+        await audio.play();
+        console.log('Playing...');
+    } catch (err) {
+        console.log('Failed to play...' + err);
+    }
+}
+
+async function fuck() {
+    var audio = new Audio('https://cdn.discordapp.com/attachments/383187113912303616/805913616561340476/fuck1.mp3');
+    audio.type = 'audio/wav';
+    audio.volume = .2;
+
+    try {
+        await audio.play();
+        console.log('Playing...');
+    } catch (err) {
+        console.log('Failed to play...' + err);
+    }
 }

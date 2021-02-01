@@ -14,7 +14,7 @@
         <a onclick="openPanel('main')">Main</a>
         <a onclick="openPanel('glow')">Glow</a>
         <a onclick="openPanel('clantag')">Tag</a>
-        <!--a onclick="openPanel('skinchanger')">Skins</a-->
+        <a onclick="openPanel('skinchanger')">Skins</a>
     </div>
 </body>
 
@@ -83,6 +83,11 @@
             <input id="nlTagBox" type="checkbox" name="user" value="nl">
             <label for="nlTagBox"><span></span>Add newline</label>
         </div>
+        <br>
+        <div>
+            <input id="backwardsTagBox" type="checkbox" name="user">
+            <label for="backwardsTagBox"><span></span>Invert</label>
+        </div>
         <h4 style="display: inline-block;">Interval:</h4>
         <input type="number" id="tagintervalbox" value="750" min="250" style="width: 60px; "> ms
         <br><br>
@@ -93,6 +98,39 @@
 
 <div class="menupanel" id="skinchanger" hidden="true">
 
+    <p>
+        <input type="checkbox" id="skinBox">
+        <label for="skinBox">Skinchanger</label>
+    </p>
+
+    <div style="width: 50%;display: inline-block;">
+        <select id="gunlist" class="list" size="12" style="display: inline-block; width: 155px; background-color: #222;color: whitesmoke;border: 1px solid black;">  
+        </select>
+        <select id="skinlist" class="list" size="11" style="width: 155px; height: 194px; margin-top: 20px; background-color: #222;color: whitesmoke;border: 1px solid black;">  
+        </select>
+    </div>
+
+    <div style="width: 50%;float:right;">
+
+        <form class="stattrakBox" onsubmit="return false;" style="float:right;">
+            <h4 style="display: inline-block;">StatTrak™:</h4>
+            <input type="number" id="stattrakBox" style="width:75px" placeholder="StatTrak">
+        </form>
+        <form class="seedBox" onsubmit="return false;" style="float:right;">
+            <h4 style="display: inline-block;">Skin seed :</h4>
+            <input type="number" id="seedBox" style="width:75px" placeholder="Seed">
+        </form>
+        <form class="kitBox" onsubmit="return false;" style="float:right;">
+            <h4 style="display: inline-block;">Paintkit ID:</h4>
+            <input type="number" id="kitBox" style="width:75px" placeholder="Skin ID">
+        </form>
+        <form class="kitNameBox" onsubmit="return false;" style="text-align: center;">
+            <h4 style="display: inline-block;">Paintkit Name:</h4>
+            <input type="text" id="kitNameBox" style="width:175px" placeholder="Skin Name">
+        </form>
+
+    </div>
+
 </div>
 
 <style>
@@ -100,6 +138,6 @@
         color: #55a2e2;
     }
 </style>
-<footer style="font-size: small;position: fixed; width: 100%; bottom: 5px;text-align: center;">Made with <span class="heart">❤</span> by lizzy</footer>
+<footer style="font-size: small;position: fixed; width: 100%; bottom: 5px;text-align: center;" onclick="pop();this.hidden = true">Made with <span class="heart">❤</span> by lizzy</footer>
 
 </html>

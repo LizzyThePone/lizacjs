@@ -25,8 +25,8 @@ fetch('https://raw.githubusercontent.com/LizzyThePone/lizacjs/master/src/cpp/Off
             if (code == 0) {
                 function createWindow() {
                     const win = new BrowserWindow({
-                        width: 400,
-                        height: 550,
+                        width: 420,
+                        height: 600,
                         backgroundColor: "#222",
                         titleBarStyle: 'hiddenInset',
                         webPreferences: {
