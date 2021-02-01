@@ -83,7 +83,69 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
     })
+
+    document.addEventListener("keydown", e => {
+        if (triggerBinding) {
+            binds.trigger.key = e.keyCode
+            binds.trigger.name = e.code
+            document.getElementById("triggerBind").innerHTML = e.code
+            triggerBinding = false
+        } else if (assistBinding) {
+            let keyInfo = getvKey(e)
+            binds.assist.key = keyInfo.vKey
+            binds.assist.name = e.code
+            document.getElementById("assistBind").innerHTML = e.code
+            assistBinding = false
+        }
+
+    })
+
+    document.addEventListener("mousedown", e => {
+        if (triggerBinding) {
+            let keyInfo = getvKey(e)
+            binds.trigger.key = keyInfo.vKey
+            binds.trigger.name = `Mouse${keyInfo.name}`
+            document.getElementById("triggerBind").innerHTML = `Mouse${keyInfo.name}`
+            triggerBinding = false
+        }
+        if (assistBinding) {
+            let keyInfo = getvKey(e)
+            binds.assist.key = keyInfo.vKey
+            binds.assist.name = `Mouse${keyInfo.name}`
+            document.getElementById("assistBind").innerHTML = `Mouse${keyInfo.name}`
+            assistBinding = false
+        }
+    })
+
 })
+
+let getvKey = e => {
+    let vKey, name;
+    switch (e.button) {
+        case 0:
+            vKey = 0x01
+            name = 1
+            break;
+        case 1:
+            vKey = 0x04
+            name = 3
+            break;
+        case 2:
+            vKey = 0x02
+            name = 2
+            break;
+        case 3:
+            vKey = 0x05
+            name = 5
+            break;
+        case 4:
+            vKey = 0x06
+            name = 4
+            break;
+    }
+    return { vKey, name }
+
+}
 
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -152,7 +214,7 @@ function setClanTag(tag) {
     document.getElementById('tagDisplay').innerHTML = tag
 }
 
-let setGun = () => {
+function setGun() {
     let selectedWeaponId = parseInt(document.getElementById('gunlist').options[document.getElementById('gunlist').selectedIndex].id.replace('gun', ""))
     let weapon = weaponMap.get(selectedWeaponId)
     if (weapon.kit) {
@@ -173,7 +235,7 @@ let setGun = () => {
     weaponMap.set(selectedWeaponId, weapon)
 }
 
-let setSkin = () => {
+function setSkin() {
     let selectedWeaponId = parseInt(document.getElementById('gunlist').options[document.getElementById('gunlist').selectedIndex].id.replace('gun', ""))
     let selectedSkinId = parseInt(document.getElementById('skinlist').options[document.getElementById('skinlist').selectedIndex].id.replace('skin', ""))
     let weapon = weaponMap.get(selectedWeaponId)
@@ -187,7 +249,7 @@ let setSkin = () => {
     lizac.setSkin(selectedWeaponId, selectedSkinId, weapon.seed, 0.0, weapon.stattrak)
 }
 
-let filterSkins = e => {
+function filterSkins(e) {
     let search = document.getElementById('kitNameBox').value.toLocaleLowerCase()
 
     if ((e.code.startsWith('Key') || e.code.startsWith('Digit') || e.code.startsWith('Numpad')) && e.code != "NumpadEnter") {
@@ -215,12 +277,7 @@ async function pop() {
     audio.type = 'audio/wav';
     audio.volume = .1;
 
-    try {
-        await audio.play();
-        console.log('Playing...');
-    } catch (err) {
-        console.log('Failed to play...' + err);
-    }
+    await audio.play();
 }
 
 async function fuck() {
@@ -228,10 +285,5 @@ async function fuck() {
     audio.type = 'audio/wav';
     audio.volume = .2;
 
-    try {
-        await audio.play();
-        console.log('Playing...');
-    } catch (err) {
-        console.log('Failed to play...' + err);
-    }
+    await audio.play();
 }
