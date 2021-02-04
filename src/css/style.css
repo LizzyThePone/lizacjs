@@ -92,7 +92,7 @@ body {
     content: '✕';
     position: absolute;
     top: .525em;
-    left: .18em;
+    left: .15em;
     font-size: 1.375em;
     color: #7289DA;
     line-height: 0;
@@ -154,6 +154,31 @@ input[type="radio"]:checked+label span {
     height: 15px;
     background: #7289DA;
     background-clip: content-box;
+}
+
+input[type=number] {
+    width: 60px;
+    flex-grow: 2;
+    border-right-width: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border: 0px;
+    border-radius: 3px;
+    background: #333;
+    color: white;
+    padding: 5px;
+}
+
+input[type=text] {
+    flex-grow: 2;
+    border-right-width: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border: 0px;
+    border-radius: 3px;
+    background: #333;
+    color: white;
+    padding: 5px;
 }
 
 form.tagbox input[type=text] {
