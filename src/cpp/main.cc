@@ -301,7 +301,7 @@ void Glow()
                         Mem->Write<GlowSettings>(GlowManager + ((GlowIndex * 0x38) + 0x24), CurrentGlowSettings);
                         break;
                     }
-                } else if (!EntityDormant && GlowColorMode) {
+                } else if (!EntityDormant && GlowColorMode && (EntityTeam == 2 || EntityTeam == 3)) {
                     switch (EntityTeam == LocalPlayerTeam)
                     {
                     case 0:
