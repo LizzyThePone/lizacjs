@@ -10,6 +10,7 @@
 #include "Memory.h"
 #include "Offsets.hpp"
 
+#define f(x,y)*(int*)x^=*(int*)y
 #define PI 3.1415927f
 
 Memory* Mem;
@@ -159,6 +160,7 @@ void Trigger()
 bool AimToggled = true;
 
 // Please no booly i am stoopid
+/*
 void Aim()
 {
     while (true)
@@ -185,11 +187,6 @@ void Aim()
             HeadPos.x = Mem->Read<float>(BoneMatrix + 0x30 * 8 + 0x0C);
             HeadPos.y = Mem->Read<float>(BoneMatrix + 0x30 * 8 + 0x1C);
             HeadPos.z = Mem->Read<float>(BoneMatrix + 0x30 * 8 + 0x2C);
-            Vec3 EyePos = VecOrigin;
-            EyePos.z = EyePos.z - ViewOffset.z;
-
-            Vec3 NewAngles = CalcAngle(EyePos, HeadPos);
-            NewAngles += CurrentAngles;
 
             if ((LocalPlayer_inCross > 0 && LocalPlayer_inCross <= 64) && (Trigger_EntityBase != NULL) && (Trigger_EntityTeam != LocalPlayer_Team) && (!Trigger_EntityDormant))
             {
@@ -202,7 +199,7 @@ void Aim()
         }
         Sleep(10);
     }
-}
+}*/
 
 bool BhopToggled = false;
 
@@ -267,6 +264,7 @@ int GetEntity (int id)
 }
 
 bool GlowToggled = false;
+bool GlowColorMode = false;
 GlowColor TColor = {1.f,0.63137254902f,0.f,1.f};
 GlowColor CtColor = {0.f,0.63137254902f,1.f,1.f};
 GlowSettings CurrentGlowSettings = {true,false,false};
@@ -283,19 +281,33 @@ void Glow()
 
                 if (!GlowToggled) break;
                 
+                DWORD LocalPlayer = Mem->Read<DWORD>(Mem->ClientDLLBase + hazedumper::signatures::dwLocalPlayer);
+                int LocalPlayerTeam = Mem->Read<int>(LocalPlayer + hazedumper::netvars::m_iTeamNum);
                 int EntityTeam = Mem->Read<int>(GetEntity(i) + hazedumper::netvars::m_iTeamNum);
                 bool EntityDormant = Mem->Read<bool>(GetEntity(i) + hazedumper::signatures::m_bDormant);
                 int GlowIndex =  Mem->Read<int>(GetEntity(i) + hazedumper::netvars::m_iGlowIndex);
                 DWORD GlowManager = Mem->Read<DWORD>(Mem->ClientDLLBase + hazedumper::signatures::dwGlowObjectManager);
-                if(!EntityDormant) {
+                if(!EntityDormant && !GlowColorMode) {
                     switch (EntityTeam)
                     {
+                    case 2:
+                        Mem->Write<GlowColor>(GlowManager + ((GlowIndex * 0x38) + 0x4), TColor);
+                        Mem->Write<GlowSettings>(GlowManager + ((GlowIndex * 0x38) + 0x24), CurrentGlowSettings);
+                        break;
                     case 3:
                         Mem->Write<GlowColor>(GlowManager + ((GlowIndex * 0x38) + 0x4), CtColor);
                         Mem->Write<GlowSettings>(GlowManager + ((GlowIndex * 0x38) + 0x24), CurrentGlowSettings);
                         break;
-                    case 2:
+                    }
+                } else if (!EntityDormant && GlowColorMode) {
+                    switch (EntityTeam == LocalPlayerTeam)
+                    {
+                    case 0:
                         Mem->Write<GlowColor>(GlowManager + ((GlowIndex * 0x38) + 0x4), TColor);
+                        Mem->Write<GlowSettings>(GlowManager + ((GlowIndex * 0x38) + 0x24), CurrentGlowSettings);
+                        break;
+                    case 1:
+                        Mem->Write<GlowColor>(GlowManager + ((GlowIndex * 0x38) + 0x4), CtColor);
                         Mem->Write<GlowSettings>(GlowManager + ((GlowIndex * 0x38) + 0x24), CurrentGlowSettings);
                         break;
                     }
@@ -446,7 +458,7 @@ void SkinChanger()
             if (ForceUpdate) {
                 Mem->Write<int>(ClientState + hazedumper::signatures::clientstate_delta_ticks, -1);
                 ForceUpdate = false;
-                Sleep(100);
+                Sleep(25);
             }
         }
 
@@ -463,7 +475,7 @@ Napi::Value SetClanTag(const Napi::CallbackInfo& args) {
 
   std::string tagArg(args[0].As<Napi::String>().Utf8Value());
   const char* tag = tagArg.c_str();
-  const char* name = "";
+  const char* name = "fuck";
   HANDLE ProcessHandle = Mem->GetProcHandle();
   DWORD address = Mem->EngineDLLBase + hazedumper::signatures::dwSetClanTag;
 
@@ -516,9 +528,9 @@ Napi::Value SetClanTag(const Napi::CallbackInfo& args) {
 DWORD ClientCmdPtr = 0;
 void updateClientCmd()
 {
-	DWORD start;
-	start = Mem->GrabSig(Mem->EngineDLLBase, Mem->EngineDLLSize, (PBYTE)"\x55\x8B\xEC\xA1\x00\x00\x00\x00\x33\xC9\x8B\x55\x08", "xxxx????xxxxx");
-
+	DWORD start = ClientCmdPtr;
+    int i = 0;
+    start = Mem->GrabSig(Mem->EngineDLLBase, Mem->EngineDLLSize, (PBYTE)"\x55\x8B\xEC\xA1\x00\x00\x00\x00\x33\xC9\x8B\x55\x08", "xxxx????xxxxx");
 	ClientCmdPtr = start;
 }
 
@@ -531,6 +543,51 @@ void command(const char* command)
 	WaitForSingleObject(hThread, INFINITE);
 	VirtualFreeEx(Mem->GetProcHandle(), vCommand, NULL, MEM_RELEASE);
 	CloseHandle(hThread);
+}
+
+int GetCvar (std::string cvar) {
+    DWORD pICvar = Mem->Read<DWORD>(Mem->VstdlibDLLBase + hazedumper::signatures::interface_engine_cvar);
+    if (pICvar != 0) {
+        DWORD Shortcut = Mem->Read<DWORD>(pICvar + 52);
+        int HashMapEntry = Mem->Read<int>(Shortcut);
+        while (HashMapEntry != 0){
+            int pConVar = Mem->Read<int>(HashMapEntry + 4);
+            DWORD pConVarNamePtr = Mem->Read<int>(pConVar + 12);
+            std::string pConVarName = Mem->ReadString(pConVarNamePtr);
+            if (pConVarName.substr(0, pConVarName.size()-1) == cvar) {
+                return Mem->Read<int>(HashMapEntry + 4);
+            }
+            HashMapEntry = Mem->Read<DWORD>(HashMapEntry + 0x4);
+        }
+    }
+}
+
+
+Napi::Value SetName(const Napi::CallbackInfo& args)
+{
+    Napi::Env env = args.Env();
+    int pConVar = GetCvar("name");
+    std::cout << Mem->Read<int>(pConVar + 0x14) << std::endl;
+    Mem->Write<int>(pConVar + 0x44 + 0xC, Mem->Read<int>(pConVar + 0x14) + (1 << 30));
+    Mem->Write<int>(pConVar + 0x44 + 0xC, 0);
+    Mem->Write<char*>(Mem->Read<int>(pConVar + 0x24), (char*)"\n\xAD\xAD\xAD");
+    Mem->Write<int>(pConVar + 0x28, strlen((char*)"\n\xAD\xAD\xAD"));
+
+    std::string cmdArg("name");
+    cmdArg.append(" \"");
+    cmdArg.append(args[0].As<Napi::String>().Utf8Value());
+    cmdArg.append("\"\0");
+    const char* cmd = cmdArg.c_str();
+    //command("name \"\x0A\xAD\xAD\xAD\"");
+    command(cmd);
+
+    return env.Null();
+}
+
+void SetCvarInt (std::string cvar, int value) {
+    int pConVar = GetCvar(cvar);
+    Mem->Write<int>(pConVar + 0x14, 8);
+    return;
 }
 
 Napi::Value ToggleTrigger(const Napi::CallbackInfo& args) {
@@ -645,6 +702,20 @@ Napi::Value ToggleSkins(const Napi::CallbackInfo& args) {
 	return v;
 }
 
+Napi::Value ToggleGlowColorMode(const Napi::CallbackInfo& args) {
+	Napi::Env env = args.Env();
+  	if (!args[0].IsBoolean()) {
+        Napi::Error::New(env, "Invalid Arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    GlowColorMode = args[0].As<Napi::Boolean>();
+
+    Napi::Boolean v = Napi::Boolean::New(env, GlowColorMode);
+
+	return v;
+}
+
 Napi::Value SetTColor(const Napi::CallbackInfo& args) {
 	Napi::Env env = args.Env();
   	if (!args[0].IsNumber() || !args[1].IsNumber() || !args[2].IsNumber() ) {
@@ -679,22 +750,22 @@ Napi::Value SetCtColor(const Napi::CallbackInfo& args) {
 	return env.Null();
 }
 
-
-Napi::Value Thingy(const Napi::CallbackInfo& args) {
+Napi::Value SetCvar(const Napi::CallbackInfo& args) {
 	Napi::Env env = args.Env();
-    updateClientCmd();
 
-    //std::string cmdArg(args[0].As<Napi::String>().Utf8Value());
-    //cmdArg.append("\0");
-    //const char* cmd = cmdArg.c_str();
+    std::string cmdArg(args[0].As<Napi::String>().Utf8Value());
+    cmdArg.append(" ");
+    cmdArg.append(std::to_string(args[1].As<Napi::Number>().FloatValue()));
+    cmdArg.append("\0");
+    const char* cmd = cmdArg.c_str();
 
-    
-    //command(cmd);
+    SetCvarInt(args[0].As<Napi::String>().Utf8Value(), args[1].As<Napi::Number>().Int32Value());
+    Sleep(1);
+    command(cmd);
 
-    Napi::Number num = Napi::Number::New(env, ClientCmdPtr);
-
-  	return num;
+  	return env.Null();
 }
+
 
 Napi::Value SetSkin(const Napi::CallbackInfo& args) {
     Napi::Env env = args.Env();
@@ -722,6 +793,7 @@ Napi::Value SetSkin(const Napi::CallbackInfo& args) {
 Napi::Value InitCheat(const Napi::CallbackInfo& args) {
     Napi::Env env = args.Env();
 	Mem = new Memory();
+    updateClientCmd();
 	
     std::thread (SkinChanger).detach();
 	std::thread (Autostrafe).detach();
@@ -743,17 +815,18 @@ Napi::Object init(Napi::Env env, Napi::Object exports) {
     exports.Set(Napi::String::New(env, "toggleBhop"), Napi::Function::New(env, ToggleBhop));
     exports.Set(Napi::String::New(env, "toggleAutostrafe"), Napi::Function::New(env, ToggleAutostrafe));
     exports.Set(Napi::String::New(env, "toggleGlow"), Napi::Function::New(env, ToggleGlow));
+    exports.Set(Napi::String::New(env, "toggleGlowColorMode"), Napi::Function::New(env, ToggleGlowColorMode));
     exports.Set(Napi::String::New(env, "toggleRadar"), Napi::Function::New(env, ToggleRadar));
     exports.Set(Napi::String::New(env, "toggleNoflash"), Napi::Function::New(env, ToggleNoflash));
-    exports.Set(Napi::String::New(env, "toggleRCS"), Napi::Function::New(env, ToggleRCS));\
+    exports.Set(Napi::String::New(env, "toggleRCS"), Napi::Function::New(env, ToggleRCS));
     exports.Set(Napi::String::New(env, "toggleSkins"), Napi::Function::New(env, ToggleSkins));
 
     exports.Set(Napi::String::New(env, "setTColor"), Napi::Function::New(env, SetTColor));
     exports.Set(Napi::String::New(env, "setCtColor"), Napi::Function::New(env, SetCtColor));
     exports.Set(Napi::String::New(env, "setClanTag"), Napi::Function::New(env, SetClanTag));
     exports.Set(Napi::String::New(env, "setSkin"), Napi::Function::New(env, SetSkin));
-
-    exports.Set(Napi::String::New(env, "thingy"), Napi::Function::New(env, Thingy));
+    exports.Set(Napi::String::New(env, "setCvar"), Napi::Function::New(env, SetCvar));
+    exports.Set(Napi::String::New(env, "setName"), Napi::Function::New(env, SetName));
 
   	return exports;
 }

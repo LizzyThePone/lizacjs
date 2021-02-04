@@ -2,8 +2,8 @@ const { app, BrowserWindow } = require('electron')
 const { exec } = require("child_process")
 const fetch = require('node-fetch')
 
-const http = require('http'); // or 'https' for https:// URLs
-const fs = require('fs');
+const http = require('http') // or 'https' for https:// URLs
+const fs = require('fs')
 
 const file = fs.createWriteStream("src/cpp/offsets.hpp");
 console.log("Downloading offsets.hpp from github...")
@@ -26,7 +26,7 @@ fetch('https://raw.githubusercontent.com/LizzyThePone/lizacjs/master/src/cpp/Off
                 function createWindow() {
                     const win = new BrowserWindow({
                         width: 420,
-                        height: 600,
+                        height: 620,
                         backgroundColor: "#222",
                         titleBarStyle: 'hiddenInset',
                         webPreferences: {

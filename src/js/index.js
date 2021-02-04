@@ -1,22 +1,26 @@
 const lizac = require("../../build/Release/lizac.node")
 const weaponMap = require("../js/weapons")
 const skinMap = require("../js/skins")
-
+const fs = require("fs-extra")
+lizac.initialize()
 
 document.title = "Lizac v0.9 (beta)"
+
+let triggerBinding = false
+let assistBinding = false
 
 let openPanel = panel => {
     for (let x of document.getElementsByClassName("menupanel")) {
         if (x.id == panel) {
-            x.hidden = false;
+            x.hidden = false
         } else {
-            x.hidden = true;
+            x.hidden = true
         }
     }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    lizac.initialize()
+    loadConfig()
 
     document.getElementById('triggerBox').addEventListener('change', (event) => {
         lizac.toggleTrigger(event.currentTarget.checked)
@@ -60,11 +64,70 @@ window.addEventListener('DOMContentLoaded', () => {
 
     lizac.toggleGlow(document.getElementById('glowBox').checked)
 
+    document.getElementById('glowTypeBox').addEventListener('change', (event) => {
+        lizac.toggleGlowColorMode(event.currentTarget.checked)
+        if (event.currentTarget.checked) {
+            document.getElementById('glowTypeBoxText').innerHTML = "Glow by Enemy"
+            document.getElementById('tColorText').innerHTML = "Enemy Color"
+            document.getElementById('ctColorText').innerHTML = "Team Color"
+        } else {
+            document.getElementById('glowTypeBoxText').innerHTML = "Glow by Team"
+            document.getElementById('tColorText').innerHTML = "T Color"
+            document.getElementById('ctColorText').innerHTML = "CT Color"
+        }
+    })
+
+    lizac.toggleGlowColorMode(document.getElementById('glowTypeBox').checked)
+
     document.getElementById('skinBox').addEventListener('change', (event) => {
         lizac.toggleSkins(event.currentTarget.checked)
     })
 
     lizac.toggleSkins(document.getElementById('skinBox').checked)
+
+    document.getElementById('ragdollBox').addEventListener('change', (event) => {
+        if (document.getElementById('ragdollBox').checked) {
+            lizac.setCvar("cl_ragdoll_gravity", parseInt(document.getElementById("ragdollAmmountbox").value))
+        } else {
+            lizac.setCvar("cl_ragdoll_gravity", 600)
+        }
+    })
+
+    document.getElementById('ragdollAmmountbox').addEventListener('change', (event) => {
+        lizac.setCvar("cl_ragdoll_gravity", parseInt(document.getElementById("ragdollAmmountbox").value))
+    })
+
+    if (document.getElementById('ragdollBox').checked) {
+        lizac.setCvar("cl_ragdoll_gravity", parseInt(document.getElementById("ragdollAmmountbox").value))
+    } else {
+        lizac.setCvar("cl_ragdoll_gravity", 600)
+    }
+    document.getElementById('grenadePreviewBox').addEventListener('change', (event) => {
+        console.log(document.getElementById('grenadePreviewBox').checked ? 1 : 0)
+        lizac.setCvar("cl_grenadepreview", document.getElementById('grenadePreviewBox').checked ? 1 : 0)
+    })
+
+    if (document.getElementById('grenadePreviewBox').checked) {
+        lizac.setCvar("cl_grenadepreview", document.getElementById('grenadePreviewBox').checked ? 1 : 0)
+    }
+
+    document.getElementById('ragdollTimeBox').addEventListener('change', (event) => {
+        if (document.getElementById('ragdollTimeBox').checked) {
+            lizac.setCvar("cl_phys_timescale", parseFloat(document.getElementById("ragdollTimeAmmountbox").value))
+        } else {
+            lizac.setCvar("cl_phys_timescale", 1)
+        }
+    })
+
+    document.getElementById('ragdollTimeAmmountbox').addEventListener('change', (event) => {
+        lizac.setCvar("cl_phys_timescale", parseFloat(document.getElementById("ragdollTimeAmmountbox").value))
+    })
+
+    if (document.getElementById('ragdollTimeBox').checked) {
+        lizac.setCvar("cl_phys_timescale", parseFloat(document.getElementById("ragdollTimeAmmountbox").value))
+    } else {
+        lizac.setCvar("cl_phys_timescale", 1)
+    }
 
     setTColor(document.getElementById('tColor').value)
     setCtColor(document.getElementById('ctColor').value)
@@ -125,23 +188,23 @@ let getvKey = e => {
         case 0:
             vKey = 0x01
             name = 1
-            break;
+            break
         case 1:
             vKey = 0x04
             name = 3
-            break;
+            break
         case 2:
             vKey = 0x02
             name = 2
-            break;
+            break
         case 3:
             vKey = 0x05
             name = 5
-            break;
+            break
         case 4:
             vKey = 0x06
             name = 4
-            break;
+            break
     }
     return { vKey, name }
 
@@ -153,7 +216,7 @@ function hexToRgb(hex) {
         r: parseInt(result[1], 16),
         g: parseInt(result[2], 16),
         b: parseInt(result[3], 16)
-    } : null;
+    } : null
 }
 
 function setTColor(hexColor) {
@@ -184,6 +247,7 @@ function setClanTagButton() {
                 currentTag = z + currentTag.charAt(0)
                 setClanTag(currentTag)
                 tagTimeout = setTimeout(tag, document.getElementById('tagintervalbox').value)
+                clearTimeout(tagTimeout - 1)
             }
             if (document.getElementById('buildTagBox').checked) {
                 if (direction) {
@@ -196,22 +260,26 @@ function setClanTagButton() {
                     direction = !direction
                 }
                 tagTimeout = setTimeout(tag, document.getElementById('tagintervalbox').value)
+                clearTimeout(tagTimeout - 1)
             }
         }
         tag()
     }
 }
 
-function setClanTag(tag) {
-    if (tag != setTag) {
-        let append = document.getElementById('nlTagBox').checked ? " \n" : ""
-        let prepend = document.getElementById('backwardsTagBox').checked ? "\u202E" : ""
-        console.log(prepend + tag + append)
+function reverse(s) {
+    return [...s].reverse().join("");
+}
 
-        lizac.setClanTag(prepend + tag + append)
-        setTag = tag
+function setClanTag(tag) {
+    let append = document.getElementById('nlTagBox').checked ? " \n" : ""
+    if (document.getElementById('backwardsTagBox').checked) {
+        lizac.setClanTag("\u202E" + reverse(append + tag))
+        document.title = ("\u202E" + reverse(tag)) || "Lizac v0.9"
+    } else {
+        lizac.setClanTag(tag + append)
+        document.title = tag || "Lizac v0.9"
     }
-    document.getElementById('tagDisplay').innerHTML = tag
 }
 
 function setGun() {
@@ -272,18 +340,124 @@ function filterSkins(e) {
     }
 }
 
-async function pop() {
-    var audio = new Audio('https://cdn.discordapp.com/attachments/383187113912303616/805915173101240340/balloon_pop_cute.wav');
-    audio.type = 'audio/wav';
-    audio.volume = .1;
+let saveSkins = () => {
+    let skinSaveArray = []
+    weaponMap.forEach((v, k) => {
+        if (v.kit) {
+            skinSaveArray.push({ id: k, skin: v })
+        }
+    })
 
-    await audio.play();
+    return skinSaveArray
+}
+
+let loadSkins = skinSaveArray => {
+    skinSaveArray.forEach((v, k) => {
+        weaponMap.set(v.id, v.skin)
+    })
+}
+
+let saveConfig = () => {
+    let saveObject = {}
+    saveObject.bhop = document.getElementById('bhopBox').checked
+    saveObject.autostrafe = document.getElementById('autostrafeBox').checked
+    saveObject.radar = document.getElementById('radarBox').checked
+    saveObject.noFlash = document.getElementById('noflashBox').checked
+    saveObject.trigger = document.getElementById('triggerBox').checked
+    saveObject.recoil = document.getElementById('rcsBox').checked
+    saveObject.glow = document.getElementById('glowBox').checked
+    saveObject.staticTag = document.getElementById('staticTagBox').checked
+    saveObject.scrollTag = document.getElementById('scrollTagBox').checked
+    saveObject.buildTag = document.getElementById('buildTagBox').checked
+    saveObject.nlTag = document.getElementById('nlTagBox').checked
+    saveObject.backwardsTag = document.getElementById('backwardsTagBox').checked
+    saveObject.skinChanger = document.getElementById('skinBox').checked
+    saveObject.ragdoll = document.getElementById('ragdollBox').checked
+    saveObject.ragdollAmmount = document.getElementById('ragdollAmmountbox').value
+    saveObject.ragdollTime = document.getElementById('ragdollTimeBox').checked
+    saveObject.ragdollTimeAmmount = document.getElementById('ragdollTimeAmmountbox').value
+    saveObject.grenadePreview = document.getElementById('grenadePreviewBox').checked
+
+    saveObject.tColor = document.getElementById('tColor').value
+    saveObject.ctColor = document.getElementById('ctColor').value
+    saveObject.tag = document.getElementById('tagbox').value
+    saveObject.tagInterval = document.getElementById('tagintervalbox').value
+    saveObject.skins = saveSkins()
+        //saveObject.binds = binds
+
+    fs.outputJson("config.json", saveObject)
+}
+
+let loadConfig = () => {
+    if (fs.pathExistsSync('config.json')) {
+        let saveObject = fs.readJsonSync('config.json')
+        document.getElementById('bhopBox').checked = saveObject.bhop
+        document.getElementById('autostrafeBox').checked = saveObject.autostrafe
+        document.getElementById('radarBox').checked = saveObject.radar
+        document.getElementById('noflashBox').checked = saveObject.noFlash
+        document.getElementById('triggerBox').checked = saveObject.trigger
+        document.getElementById('rcsBox').checked = saveObject.recoil
+        document.getElementById('glowBox').checked = saveObject.glow
+        document.getElementById('staticTagBox').checked = saveObject.staticTag
+        document.getElementById('scrollTagBox').checked = saveObject.scrollTag
+        document.getElementById('buildTagBox').checked = saveObject.buildTag
+        document.getElementById('nlTagBox').checked = saveObject.nlTag
+        document.getElementById('backwardsTagBox').checked = saveObject.backwardsTag
+        document.getElementById('skinBox').checked = saveObject.skinChanger
+        document.getElementById('ragdollBox').checked = saveObject.ragdoll
+        document.getElementById('ragdollAmmountbox').value = saveObject.ragdollAmmount
+        document.getElementById('ragdollTimeBox').checked = saveObject.ragdollTime
+        document.getElementById('ragdollTimeAmmountbox').value = saveObject.ragdollTimeAmmount
+        document.getElementById('grenadePreviewBox').checked = saveObject.grenadePreview
+
+        document.getElementById('tColor').value = saveObject.tColor
+        document.getElementById('ctColor').value = saveObject.ctColor
+        document.getElementById('tagbox').value = saveObject.tag
+        document.getElementById('tagintervalbox').value = saveObject.tagInterval
+            //loadBinds(saveObject.binds)
+        loadSkins(saveObject.skins)
+    } else {
+        let saveObject = fs.readJsonSync('config_default.json')
+        document.getElementById('bhopBox').checked = saveObject.bhop
+        document.getElementById('autostrafeBox').checked = saveObject.autostrafe
+        document.getElementById('radarBox').checked = saveObject.radar
+        document.getElementById('noflashBox').checked = saveObject.noFlash
+        document.getElementById('triggerBox').checked = saveObject.trigger
+        document.getElementById('rcsBox').checked = saveObject.recoil
+        document.getElementById('glowBox').checked = saveObject.glow
+        document.getElementById('staticTagBox').checked = saveObject.staticTag
+        document.getElementById('scrollTagBox').checked = saveObject.scrollTag
+        document.getElementById('buildTagBox').checked = saveObject.buildTag
+        document.getElementById('nlTagBox').checked = saveObject.nlTag
+        document.getElementById('backwardsTagBox').checked = saveObject.backwardsTag
+        document.getElementById('skinBox').checked = saveObject.skinChanger
+        document.getElementById('ragdollBox').checked = saveObject.ragdoll
+        document.getElementById('ragdollAmmountbox').value = saveObject.ragdollAmmount
+        document.getElementById('ragdollTimeBox').checked = saveObject.ragdollTime
+        document.getElementById('ragdollTimeAmmountbox').value = saveObject.ragdollTimeAmmount
+        document.getElementById('grenadePreviewBox').checked = saveObject.grenadePreview
+
+        document.getElementById('tColor').value = saveObject.tColor
+        document.getElementById('ctColor').value = saveObject.ctColor
+        document.getElementById('tagbox').value = saveObject.tag
+        document.getElementById('tagintervalbox').value = saveObject.tagInterval
+            //loadBinds(saveObject.binds)
+        loadSkins(saveObject.skins)
+    }
+}
+
+async function pop() {
+    var audio = new Audio('https://cdn.discordapp.com/attachments/383187113912303616/805915173101240340/balloon_pop_cute.wav')
+    audio.type = 'audio/wav'
+    audio.volume = .1
+
+    await audio.play()
 }
 
 async function fuck() {
-    var audio = new Audio('https://cdn.discordapp.com/attachments/383187113912303616/805913616561340476/fuck1.mp3');
-    audio.type = 'audio/wav';
-    audio.volume = .2;
+    var audio = new Audio('https://cdn.discordapp.com/attachments/383187113912303616/805913616561340476/fuck1.mp3')
+    audio.type = 'audio/wav'
+    audio.volume = .2
 
-    await audio.play();
+    await audio.play()
 }

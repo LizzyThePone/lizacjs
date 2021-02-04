@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Loading...</title>
+    <title id="tagDisplay">Loading...</title>
     <link rel="stylesheet" type="text/css" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="../js/index.js"></script>
@@ -12,13 +12,49 @@
 <body style="background: white;">
     <div class="navbar">
         <a onclick="openPanel('main')">Main</a>
-        <a onclick="openPanel('glow')">Glow</a>
-        <a onclick="openPanel('clantag')">Tag</a>
+        <a onclick="openPanel('visual')">Visuals</a>
+        <!--a onclick="openPanel('clantag')">Tag</a-->
         <a onclick="openPanel('skinchanger')">Skins</a>
     </div>
 </body>
 
 <div class="menupanel" id="main">
+
+    <div class="tagDiv">
+        <form class="tagbox" style="max-width:340px" onsubmit="return false;">
+            <input type="text" id="tagbox" placeholder="Clantag" name="set">
+            <button onclick="setClanTagButton()">   Set   </button>
+        </form>
+        <br>
+        <div>
+            <input id="staticTagBox" type="radio" name="user" value="Static">
+            <label for="staticTagBox"><span></span>Static</label>
+
+            <input id="scrollTagBox" type="radio" name="user" value="Scroll" checked="true">
+            <label for="scrollTagBox"><span></span>Scroll</label>
+
+            <input id="buildTagBox" type="radio" name="user" value="build">
+            <label for="buildTagBox"><span></span>Build</label>
+
+            <!--input id="gamesenseTagBox" type="radio" name="user" value="Static">
+            <label for="gamesenseTagBox"><span></span>gamesense</label-->
+        </div>
+        <br>
+        <div>
+            <input id="nlTagBox" type="checkbox" name="user" value="nl">
+            <label for="nlTagBox"><span></span>Add newline</label>
+        </div>
+        <br>
+        <div>
+            <input id="backwardsTagBox" type="checkbox" name="user">
+            <label for="backwardsTagBox"><span></span>Invert</label>
+        </div>
+        <h4 style="display: inline-block;">Interval:</h4>
+        <input type="number" id="tagintervalbox" value="750" min="250" style="width: 60px; "> ms
+    </div>
+
+    <hr style="margin-top: 5px;margin-bottom: 25px;">
+
     <p>
         <input type="checkbox" id="triggerBox">
         <label for="triggerBox">Triggerbot</label>
@@ -35,6 +71,14 @@
         <input type="checkbox" id="autostrafeBox">
         <label for="autostrafeBox">Autostrafe</label>
     </p>
+
+    <div style="position: absolute; transform: translateX(-50%); left: 50%;">
+        <button class="saveconfig" onclick="saveConfig()">Save</button>
+    </div>
+</div>
+
+<div class="menupanel" id="visual" hidden="true">
+
     <p>
         <input type="checkbox" id="radarBox">
         <label for="radarBox">Radar</label>
@@ -43,18 +87,36 @@
         <input type="checkbox" id="noflashBox">
         <label for="noflashBox">Noflash</label>
     </p>
-</div>
+    <p>
+        <input type="checkbox" id="grenadePreviewBox">
+        <label for="grenadePreviewBox">Grenade Preview</label>
+    </p>
+    <p>
+        <input type="checkbox" id="ragdollBox">
+        <label for="ragdollBox">Ragdoll Gravity</label>
+        <input type="number" id="ragdollAmmountbox" value="600" min="-10000" style="width: 60px; float: right;margin-top: 5px;">
+    </p>
+    <p>
+        <input type="checkbox" id="ragdollTimeBox">
+        <label for="ragdollTimeBox">Ragdoll Time</label>
+        <input type="number" id="ragdollTimeAmmountbox" value="0.25" min="0" max="4" step="0.01" style="width: 60px; float: right;margin-top: 5px;">
+    </p>
 
-<div class="menupanel" id="glow" hidden="true">
+    <hr style="margin-top: 25px;margin-bottom: 25px;">
+
     <p>
         <input type="checkbox" id="glowBox">
         <label for="glowBox">Glow main</label>
     </p>
+    <p>
+        <input type="checkbox" id="glowTypeBox">
+        <label for="glowTypeBox" id="glowTypeBoxText">Glow by Team</label>
+    </p>
 
-    <h3 style="display: inline-block;">T color:</h3>
-    <input type="color" id="tColor" value="#ffa100" style="width:100px;text-align:right;" onchange="setTColor(this.value)">
+    <h3 style="display: inline-block;" id="tColorText">T color:</h3>
+    <input type="color" id="tColor" value="#ffa100" style="width:100px;text-align:right;display: inline-block;" onchange="setTColor(this.value)">
     <br>
-    <h3 style="display: inline-block;">CT color:</h3>
+    <h3 style="display: inline-block;" id="ctColorText">CT color:</h3>
     <input type="color" id="ctColor" value="#00a1ff" style="width:100px;text-align:right;" onchange="setCtColor(this.value)">
 </div>
 

@@ -13,9 +13,12 @@ private:
 
 public:
 	MODULEENTRY32 ClientDLL,
+		VstdlibDLL,
 		EngineDLL;
 	DWORD ClientDLLBase,
 		ClientDLLSize,
+		VstdlibDLLBase,
+		VstdlibDLLSize,
 		EngineDLLBase,
 		EngineDLLSize;
 
@@ -69,6 +72,38 @@ public:
 		return (DWORD)0x0;
 	}
 
+	DWORD GetModuleSize(char* ModuleName)
+	{
+		HMODULE hModules[1024];
+        unsigned int i;
+        DWORD cbNeeded; 
+		MODULEENTRY32 mEntry;
+		mEntry.dwSize = sizeof(mEntry);
+
+		if( EnumProcessModulesEx(Handle, hModules, sizeof(hModules), &cbNeeded, LIST_MODULES_32BIT) )
+        {
+            for ( i = 0; i < (cbNeeded / sizeof(HMODULE)); i++ )
+            {
+                TCHAR szModName[MAX_PATH];
+
+
+                if ( GetModuleBaseName( Handle, hModules[i], szModName, sizeof(szModName) / sizeof(TCHAR)))
+                {
+                    //MessageBoxA(NULL, szModName, "FUCK", MB_ICONSTOP | MB_OK);
+                    if (!strcmp(szModName, ModuleName))
+                    {
+						MODULEINFO mInfo;
+						DWORD cb;
+						GetModuleInformation(Handle, hModules[i], &mInfo, cb);
+                        return mInfo.SizeOfImage;
+                    }
+                }
+        }
+    }
+		return (DWORD)0x0;
+	}
+
+
 	bool DataCompare(BYTE* data, BYTE* sign, char* mask)
 	{
 		for (; *mask; mask++, sign++, data++)
@@ -116,6 +151,38 @@ public:
 		return val;
 	}
 
+	char ReadChar(DWORD dwAddress) {
+		char value;
+		ReadProcessMemory(Handle, (LPVOID)dwAddress, &value, sizeof(char), NULL);
+		return value;
+	}
+
+	std::string ReadString(DWORD dwAddress) {
+		std::vector<char> chars;
+		int offset = 0x0;
+		while (true) {
+			char c = ReadChar(dwAddress + offset);
+			chars.push_back(c);
+
+			// break at 1 million chars
+			if (offset == (sizeof(char) * 1000000)) {
+				chars.clear();
+				break;
+			}
+
+			// break at terminator (end of string)
+			if (c == '\0') {
+				break;
+			}
+
+			// go to next char
+			offset += sizeof(char);
+		}
+
+		std::string s(chars.begin(), chars.end());
+		return s;
+	}
+
 	template<class c>
 	BOOL Write(DWORD dwAddress, c ValueToWrite)
 	{
@@ -135,10 +202,13 @@ public:
 			//this->EngineDLL = GetModule((wchar_t*)"engine.dll");
 			this->ClientDLLBase = GetModule("client.dll");
 			this->EngineDLLBase = GetModule("engine.dll");
+			this->VstdlibDLLBase = GetModule("vstdlib.dll");
 			if (this->ClientDLLBase == 0x0) throw 2;
 			if (this->EngineDLLBase == 0x0) throw 3;
-			this->ClientDLLSize = this->ClientDLL.dwSize;
-			this->EngineDLLSize = this->EngineDLL.dwSize;
+			if (this->VstdlibDLLBase == 0x0) throw 4;
+			this->ClientDLLSize = GetModuleSize("client.dll");
+			this->EngineDLLSize = GetModuleSize("engine.dll");
+			this->VstdlibDLLSize = GetModuleSize("vstdlib.dll");
 		}
 		catch (int iEx) {
 			switch (iEx)
@@ -146,6 +216,7 @@ public:
 			case 1: std::cout << "CS:GO must be running"; exit(0); break;
 			case 2: std::cout << "Couldn't find Client.dll"; exit(0); break;
 			case 3: std::cout << "Couldn't find Engine.dll"; exit(0); break;
+			case 4: std::cout << "Couldn't find vstdlib.dll"; exit(0); break;
 			default: throw;
 			}
 		}

@@ -41,7 +41,7 @@ body {
     padding: 14px 0;
     text-decoration: none;
     font-size: 17px;
-    width: 25%;
+    width: calc(100% / 3);
 }
 
 .navbar a:hover {
@@ -209,4 +209,30 @@ form.tagbox button {
     border-left: none;
     cursor: pointer;
     border-radius: 4px;
+}
+
+.saveconfig :hover {
+    background: #7FA0E8;
+}
+
+.saveconfig {
+    transform: translateY(-50%);
+    width: 80px;
+    height: 40px;
+    padding: 10px;
+    margin-top: 15px;
+    border-top: 25px;
+    border-bottom: 25px;
+    background: #7289DA;
+    border-top: 25px;
+    color: white;
+    font-size: 17px;
+    border: 1px solid #7289DA;
+    border-left: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.saveconfig :hover {
+    background: #7FA0E8;
 }
