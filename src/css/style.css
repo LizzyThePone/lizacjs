@@ -100,43 +100,68 @@ body {
     transition: all .2s;
 }
 
+::-webkit-scrollbar {
+    width: 8px;
+    height: 3px;
+}
+
+::-webkit-scrollbar-button {
+    background-color: #666;
+    height: 0;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #646464;
+}
+
+::-webkit-scrollbar-track-piece {
+    background-color: #444;
+}
+
+::-webkit-scrollbar-thumb {
+    height: 50px;
+    background-color: #666;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-corner {
+    background-color: #646464;
+}
+
+
+}
+::-webkit-resizer {
+    background-color: #666;
+}
 
 /* checked mark aspect changes */
-
 [type="checkbox"]:not(:checked)+label:after {
     opacity: 0;
     -webkit-transform: scale(0) rotate(45deg);
     transform: scale(0) rotate(45deg);
 }
-
 [type="checkbox"]:checked+label:after {
     opacity: 1;
     -webkit-transform: scale(1) rotate(0);
     transform: scale(1) rotate(0);
 }
 
-
 /* Disabled checkbox */
-
 [type="checkbox"]:disabled:not(:checked)+label:before,
 [type="checkbox"]:disabled:checked+label:before {
     box-shadow: none;
     border-color: #bbb;
     background-color: #e9e9e9;
 }
-
 [type="checkbox"]:disabled:checked+label:after {
     color: #777;
 }
-
 [type="checkbox"]:disabled+label {
     color: #aaa;
 }
-
 input[type="radio"] {
     display: none;
 }
-
 input[type="radio"]+label span {
     display: inline-block;
     width: 15px;
@@ -148,14 +173,12 @@ input[type="radio"]+label span {
     padding: 2px;
     margin: 0 5px;
 }
-
 input[type="radio"]:checked+label span {
     width: 15px;
     height: 15px;
     background: #7289DA;
     background-clip: content-box;
 }
-
 input[type=number] {
     width: 60px;
     flex-grow: 2;
@@ -168,7 +191,6 @@ input[type=number] {
     color: white;
     padding: 5px;
 }
-
 input[type=text] {
     flex-grow: 2;
     border-right-width: 0;
@@ -180,7 +202,6 @@ input[type=text] {
     color: white;
     padding: 5px;
 }
-
 form.tagbox input[type=text] {
     padding: 10px;
     font-size: 17px;
@@ -188,30 +209,25 @@ form.tagbox input[type=text] {
     width: 80%;
     background: #f1f1f1;
 }
-
 .tagDiv {
     padding-top: 15px;
 }
-
 form.tagbox {
     display: flex;
     flex-direction: row;
 }
-
 form.tagbox input,
 form.tagbox button {
     border-radius: 5px;
     border: 1px solid grey;
     padding: 10px;
 }
-
 form.tagbox input {
     flex-grow: 2;
     border-right-width: 0;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
-
 form.tagbox button {
     background: #7289DA;
     color: white;
@@ -219,7 +235,6 @@ form.tagbox button {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
-
 .setskins {
     float: right;
     width: 50px;
@@ -235,11 +250,9 @@ form.tagbox button {
     cursor: pointer;
     border-radius: 4px;
 }
-
 .saveconfig :hover {
     background: #7FA0E8;
 }
-
 .saveconfig {
     transform: translateY(-50%);
     width: 80px;
@@ -257,11 +270,9 @@ form.tagbox button {
     cursor: pointer;
     border-radius: 4px;
 }
-
 .saveconfig :hover {
     background: #7FA0E8;
 }
-
 .setbind {
     float: right;
     width: auto;
