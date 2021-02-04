@@ -8,6 +8,7 @@ document.title = "Lizac v0.9 (beta)"
 
 let triggerBinding = false
 let assistBinding = false
+let binds = { trigger: {} }
 
 let openPanel = panel => {
     for (let x of document.getElementsByClassName("menupanel")) {
@@ -152,15 +153,9 @@ window.addEventListener('DOMContentLoaded', () => {
             binds.trigger.key = e.keyCode
             binds.trigger.name = e.code
             document.getElementById("triggerBind").innerHTML = e.code
+            lizac.setTriggerBind(e.code)
             triggerBinding = false
-        } else if (assistBinding) {
-            let keyInfo = getvKey(e)
-            binds.assist.key = keyInfo.vKey
-            binds.assist.name = e.code
-            document.getElementById("assistBind").innerHTML = e.code
-            assistBinding = false
         }
-
     })
 
     document.addEventListener("mousedown", e => {
@@ -169,14 +164,8 @@ window.addEventListener('DOMContentLoaded', () => {
             binds.trigger.key = keyInfo.vKey
             binds.trigger.name = `Mouse${keyInfo.name}`
             document.getElementById("triggerBind").innerHTML = `Mouse${keyInfo.name}`
+            lizac.setTriggerBind(binds.trigger.key)
             triggerBinding = false
-        }
-        if (assistBinding) {
-            let keyInfo = getvKey(e)
-            binds.assist.key = keyInfo.vKey
-            binds.assist.name = `Mouse${keyInfo.name}`
-            document.getElementById("assistBind").innerHTML = `Mouse${keyInfo.name}`
-            assistBinding = false
         }
     })
 
@@ -357,6 +346,12 @@ let loadSkins = skinSaveArray => {
     })
 }
 
+let loadBinds = bindSave => {
+    document.getElementById("triggerBind").innerHTML = `${bindSave.trigger.name}`
+    binds.trigger.key = bindSave.trigger.key
+    lizac.setTriggerBind(binds.trigger.key)
+}
+
 let saveConfig = () => {
     let saveObject = {}
     saveObject.bhop = document.getElementById('bhopBox').checked
@@ -383,7 +378,7 @@ let saveConfig = () => {
     saveObject.tag = document.getElementById('tagbox').value
     saveObject.tagInterval = document.getElementById('tagintervalbox').value
     saveObject.skins = saveSkins()
-        //saveObject.binds = binds
+    saveObject.binds = binds
 
     fs.outputJson("config.json", saveObject)
 }

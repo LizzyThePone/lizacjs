@@ -15,6 +15,8 @@
 
 Memory* Mem;
 
+int TriggerBind = 0x06;
+
 struct GlowColor {
 	float r, g, b, a;
 };
@@ -134,11 +136,11 @@ void Trigger()
     while (true)
     {
 
-        if (!TriggerToggled || !GetAsyncKeyState(VK_XBUTTON2)) {
+        if (!TriggerToggled || !GetAsyncKeyState(TriggerBind)) {
             Sleep(100);
         }
 
-        else if (TriggerToggled && GetAsyncKeyState(VK_XBUTTON2)){
+        else if (TriggerToggled && GetAsyncKeyState(TriggerBind)){
             DWORD LocalPlayer_Base = Mem->Read<DWORD>(Mem->ClientDLLBase + hazedumper::signatures::dwLocalPlayer);
             int LocalPlayer_inCross = Mem->Read<int>(LocalPlayer_Base + hazedumper::netvars::m_iCrosshairId);
             int LocalPlayer_Team = Mem->Read<int>(LocalPlayer_Base + hazedumper::netvars::m_iTeamNum);
@@ -790,6 +792,21 @@ Napi::Value SetSkin(const Napi::CallbackInfo& args) {
     return bitchbool;
 }
 
+Napi::Value SetTriggerBind(const Napi::CallbackInfo& args) {
+    Napi::Env env = args.Env();
+
+    if (!args[0].IsNumber() ) {
+        Napi::Error::New(env, "Invalid Arguments").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    TriggerBind = args[0].As<Napi::Number>().Int32Value();
+
+    
+    Napi::Number v = Napi::Number::New(env, TriggerBind);
+    return v;
+}
+
 Napi::Value InitCheat(const Napi::CallbackInfo& args) {
     Napi::Env env = args.Env();
 	Mem = new Memory();
@@ -827,6 +844,7 @@ Napi::Object init(Napi::Env env, Napi::Object exports) {
     exports.Set(Napi::String::New(env, "setSkin"), Napi::Function::New(env, SetSkin));
     exports.Set(Napi::String::New(env, "setCvar"), Napi::Function::New(env, SetCvar));
     exports.Set(Napi::String::New(env, "setName"), Napi::Function::New(env, SetName));
+    exports.Set(Napi::String::New(env, "setTriggerBind"), Napi::Function::New(env, SetTriggerBind));
 
   	return exports;
 }

@@ -236,3 +236,19 @@ form.tagbox button {
 .saveconfig :hover {
     background: #7FA0E8;
 }
+
+.setbind {
+    float: right;
+    width: auto;
+    height: 30px;
+    padding: 6px;
+    border-top: 25px;
+    background: #7289DA;
+    border-top: 25px;
+    color: white;
+    font-size: 16px;
+    border: 1px solid #7289DA;
+    border-left: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
