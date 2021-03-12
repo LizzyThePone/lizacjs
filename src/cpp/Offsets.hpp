@@ -1,154 +1,149 @@
-#pragma once
-#include <cstdint>
-
-// 2021-02-10 15:26:29.435232400 UTC
-
-namespace hazedumper {
-constexpr ::std::int64_t timestamp = 1612970789;
-namespace netvars {
-constexpr ::std::ptrdiff_t cs_gamerules_data = 0x0;
-constexpr ::std::ptrdiff_t m_ArmorValue = 0xB378;
-constexpr ::std::ptrdiff_t m_Collision = 0x320;
-constexpr ::std::ptrdiff_t m_CollisionGroup = 0x474;
-constexpr ::std::ptrdiff_t m_Local = 0x2FBC;
-constexpr ::std::ptrdiff_t m_MoveType = 0x25C;
-constexpr ::std::ptrdiff_t m_OriginalOwnerXuidHigh = 0x31C4;
-constexpr ::std::ptrdiff_t m_OriginalOwnerXuidLow = 0x31C0;
-constexpr ::std::ptrdiff_t m_SurvivalGameRuleDecisionTypes = 0x1328;
-constexpr ::std::ptrdiff_t m_SurvivalRules = 0xD00;
-constexpr ::std::ptrdiff_t m_aimPunchAngle = 0x302C;
-constexpr ::std::ptrdiff_t m_aimPunchAngleVel = 0x3038;
-constexpr ::std::ptrdiff_t m_angEyeAnglesX = 0xB37C;
-constexpr ::std::ptrdiff_t m_angEyeAnglesY = 0xB380;
-constexpr ::std::ptrdiff_t m_bBombPlanted = 0x9A5;
-constexpr ::std::ptrdiff_t m_bFreezePeriod = 0x20;
-constexpr ::std::ptrdiff_t m_bGunGameImmunity = 0x3944;
-constexpr ::std::ptrdiff_t m_bHasDefuser = 0xB388;
-constexpr ::std::ptrdiff_t m_bHasHelmet = 0xB36C;
-constexpr ::std::ptrdiff_t m_bInReload = 0x32A5;
-constexpr ::std::ptrdiff_t m_bIsDefusing = 0x3930;
-constexpr ::std::ptrdiff_t m_bIsQueuedMatchmaking = 0x74;
-constexpr ::std::ptrdiff_t m_bIsScoped = 0x3928;
-constexpr ::std::ptrdiff_t m_bIsValveDS = 0x7C;
-constexpr ::std::ptrdiff_t m_bSpotted = 0x93D;
-constexpr ::std::ptrdiff_t m_bSpottedByMask = 0x980;
-constexpr ::std::ptrdiff_t m_bStartedArming = 0x33F0;
-constexpr ::std::ptrdiff_t m_bUseCustomAutoExposureMax = 0x9D9;
-constexpr ::std::ptrdiff_t m_bUseCustomAutoExposureMin = 0x9D8;
-constexpr ::std::ptrdiff_t m_bUseCustomBloomScale = 0x9DA;
-constexpr ::std::ptrdiff_t m_clrRender = 0x70;
-constexpr ::std::ptrdiff_t m_dwBoneMatrix = 0x26A8;
-constexpr ::std::ptrdiff_t m_fAccuracyPenalty = 0x3330;
-constexpr ::std::ptrdiff_t m_fFlags = 0x104;
-constexpr ::std::ptrdiff_t m_flC4Blow = 0x2990;
-constexpr ::std::ptrdiff_t m_flCustomAutoExposureMax = 0x9E0;
-constexpr ::std::ptrdiff_t m_flCustomAutoExposureMin = 0x9DC;
-constexpr ::std::ptrdiff_t m_flCustomBloomScale = 0x9E4;
-constexpr ::std::ptrdiff_t m_flDefuseCountDown = 0x29AC;
-constexpr ::std::ptrdiff_t m_flDefuseLength = 0x29A8;
-constexpr ::std::ptrdiff_t m_flFallbackWear = 0x31D0;
-constexpr ::std::ptrdiff_t m_flFlashDuration = 0xA420;
-constexpr ::std::ptrdiff_t m_flFlashMaxAlpha = 0xA41C;
-constexpr ::std::ptrdiff_t m_flLastBoneSetupTime = 0x2924;
-constexpr ::std::ptrdiff_t m_flLowerBodyYawTarget = 0x3A90;
-constexpr ::std::ptrdiff_t m_flNextAttack = 0x2D70;
-constexpr ::std::ptrdiff_t m_flNextPrimaryAttack = 0x3238;
-constexpr ::std::ptrdiff_t m_flSimulationTime = 0x268;
-constexpr ::std::ptrdiff_t m_flTimerLength = 0x2994;
-constexpr ::std::ptrdiff_t m_hActiveWeapon = 0x2EF8;
-constexpr ::std::ptrdiff_t m_hMyWeapons = 0x2DF8;
-constexpr ::std::ptrdiff_t m_hObserverTarget = 0x338C;
-constexpr ::std::ptrdiff_t m_hOwner = 0x29CC;
-constexpr ::std::ptrdiff_t m_hOwnerEntity = 0x14C;
-constexpr ::std::ptrdiff_t m_iAccountID = 0x2FC8;
-constexpr ::std::ptrdiff_t m_iClip1 = 0x3264;
-constexpr ::std::ptrdiff_t m_iCompetitiveRanking = 0x1A84;
-constexpr ::std::ptrdiff_t m_iCompetitiveWins = 0x1B88;
-constexpr ::std::ptrdiff_t m_iCrosshairId = 0xB3E4;
-constexpr ::std::ptrdiff_t m_iEntityQuality = 0x2FAC;
-constexpr ::std::ptrdiff_t m_iFOV = 0x31E4;
-constexpr ::std::ptrdiff_t m_iFOVStart = 0x31E8;
-constexpr ::std::ptrdiff_t m_iGlowIndex = 0xA438;
-constexpr ::std::ptrdiff_t m_iHealth = 0x100;
-constexpr ::std::ptrdiff_t m_iItemDefinitionIndex = 0x2FAA;
-constexpr ::std::ptrdiff_t m_iItemIDHigh = 0x2FC0;
-constexpr ::std::ptrdiff_t m_iMostRecentModelBoneCounter = 0x2690;
-constexpr ::std::ptrdiff_t m_iObserverMode = 0x3378;
-constexpr ::std::ptrdiff_t m_iShotsFired = 0xA390;
-constexpr ::std::ptrdiff_t m_iState = 0x3258;
-constexpr ::std::ptrdiff_t m_iTeamNum = 0xF4;
-constexpr ::std::ptrdiff_t m_lifeState = 0x25F;
-constexpr ::std::ptrdiff_t m_nFallbackPaintKit = 0x31C8;
-constexpr ::std::ptrdiff_t m_nFallbackSeed = 0x31CC;
-constexpr ::std::ptrdiff_t m_nFallbackStatTrak = 0x31D4;
-constexpr ::std::ptrdiff_t m_nForceBone = 0x268C;
-constexpr ::std::ptrdiff_t m_nTickBase = 0x3430;
-constexpr ::std::ptrdiff_t m_rgflCoordinateFrame = 0x444;
-constexpr ::std::ptrdiff_t m_szCustomName = 0x303C;
-constexpr ::std::ptrdiff_t m_szLastPlaceName = 0x35B4;
-constexpr ::std::ptrdiff_t m_thirdPersonViewAngles = 0x31D8;
-constexpr ::std::ptrdiff_t m_vecOrigin = 0x138;
-constexpr ::std::ptrdiff_t m_vecVelocity = 0x114;
-constexpr ::std::ptrdiff_t m_vecViewOffset = 0x108;
-constexpr ::std::ptrdiff_t m_viewPunchAngle = 0x3020;
-} // namespace netvars
-namespace signatures {
-constexpr ::std::ptrdiff_t anim_overlays = 0x2980;
-constexpr ::std::ptrdiff_t clientstate_choked_commands = 0x4D30;
-constexpr ::std::ptrdiff_t clientstate_delta_ticks = 0x174;
-constexpr ::std::ptrdiff_t clientstate_last_outgoing_command = 0x4D2C;
-constexpr ::std::ptrdiff_t clientstate_net_channel = 0x9C;
-constexpr ::std::ptrdiff_t convar_name_hash_table = 0x2F0F8;
-constexpr ::std::ptrdiff_t dwClientState = 0x58EFE4;
-constexpr ::std::ptrdiff_t dwClientState_GetLocalPlayer = 0x180;
-constexpr ::std::ptrdiff_t dwClientState_IsHLTV = 0x4D48;
-constexpr ::std::ptrdiff_t dwClientState_Map = 0x28C;
-constexpr ::std::ptrdiff_t dwClientState_MapDirectory = 0x188;
-constexpr ::std::ptrdiff_t dwClientState_MaxPlayer = 0x388;
-constexpr ::std::ptrdiff_t dwClientState_PlayerInfo = 0x52C0;
-constexpr ::std::ptrdiff_t dwClientState_State = 0x108;
-constexpr ::std::ptrdiff_t dwClientState_ViewAngles = 0x4D90;
-constexpr ::std::ptrdiff_t dwEntityList = 0x4DA2F44;
-constexpr ::std::ptrdiff_t dwForceAttack = 0x31D44D4;
-constexpr ::std::ptrdiff_t dwForceAttack2 = 0x31D44E0;
-constexpr ::std::ptrdiff_t dwForceBackward = 0x31D448C;
-constexpr ::std::ptrdiff_t dwForceForward = 0x31D44F8;
-constexpr ::std::ptrdiff_t dwForceJump = 0x524CEA4;
-constexpr ::std::ptrdiff_t dwForceLeft = 0x31D4480;
-constexpr ::std::ptrdiff_t dwForceRight = 0x31D44A4;
-constexpr ::std::ptrdiff_t dwGameDir = 0x62D7F8;
-constexpr ::std::ptrdiff_t dwGameRulesProxy = 0x52C018C;
-constexpr ::std::ptrdiff_t dwGetAllClasses = 0xDB2F8C;
-constexpr ::std::ptrdiff_t dwGlobalVars = 0x58ECE8;
-constexpr ::std::ptrdiff_t dwGlowObjectManager = 0x52EB540;
-constexpr ::std::ptrdiff_t dwInput = 0x51F4528;
-constexpr ::std::ptrdiff_t dwInterfaceLinkList = 0x9457A4;
-constexpr ::std::ptrdiff_t dwLocalPlayer = 0xD8B2BC;
-constexpr ::std::ptrdiff_t dwMouseEnable = 0xD90E60;
-constexpr ::std::ptrdiff_t dwMouseEnablePtr = 0xD90E30;
-constexpr ::std::ptrdiff_t dwPlayerResource = 0x31D2800;
-constexpr ::std::ptrdiff_t dwRadarBase = 0x51D7CBC;
-constexpr ::std::ptrdiff_t dwSensitivity = 0xD90CFC;
-constexpr ::std::ptrdiff_t dwSensitivityPtr = 0xD90CD0;
-constexpr ::std::ptrdiff_t dwSetClanTag = 0x8A1A0;
-constexpr ::std::ptrdiff_t dwViewMatrix = 0x4D94844;
-constexpr ::std::ptrdiff_t dwWeaponTable = 0x51F4FE8;
-constexpr ::std::ptrdiff_t dwWeaponTableIndex = 0x325C;
-constexpr ::std::ptrdiff_t dwYawPtr = 0xD90AC0;
-constexpr ::std::ptrdiff_t dwZoomSensitivityRatioPtr = 0xD95D60;
-constexpr ::std::ptrdiff_t dwbSendPackets = 0xD73EA;
-constexpr ::std::ptrdiff_t dwppDirect3DDevice9 = 0xA7050;
-constexpr ::std::ptrdiff_t find_hud_element = 0x3057E320;
-constexpr ::std::ptrdiff_t force_update_spectator_glow = 0x3AD962;
-constexpr ::std::ptrdiff_t interface_engine_cvar = 0x3E9EC;
-constexpr ::std::ptrdiff_t is_c4_owner = 0x3BA430;
-constexpr ::std::ptrdiff_t m_bDormant = 0xED;
-constexpr ::std::ptrdiff_t m_flSpawnTime = 0xA370;
-constexpr ::std::ptrdiff_t m_pStudioHdr = 0x294C;
-constexpr ::std::ptrdiff_t m_pitchClassPtr = 0x51D7F58;
-constexpr ::std::ptrdiff_t m_yawClassPtr = 0xD90AC0;
-constexpr ::std::ptrdiff_t model_ambient_min = 0x59205C;
-constexpr ::std::ptrdiff_t set_abs_angles = 0x1DF9C0;
-constexpr ::std::ptrdiff_t set_abs_origin = 0x1DF800;
-} // namespace signatures
-} // namespace hazedumper
+{
+  "timestamp": 1615498313,
+  "signatures": {
+    "anim_overlays": 10624,
+    "clientstate_choked_commands": 19760,
+    "clientstate_delta_ticks": 372,
+    "clientstate_last_outgoing_command": 19756,
+    "clientstate_net_channel": 156,
+    "convar_name_hash_table": 192760,
+    "dwClientState": 5828580,
+    "dwClientState_GetLocalPlayer": 384,
+    "dwClientState_IsHLTV": 19784,
+    "dwClientState_Map": 652,
+    "dwClientState_MapDirectory": 392,
+    "dwClientState_MaxPlayer": 904,
+    "dwClientState_PlayerInfo": 21184,
+    "dwClientState_State": 264,
+    "dwClientState_ViewAngles": 19856,
+    "dwEntityList": 81407780,
+    "dwForceAttack": 52249708,
+    "dwForceAttack2": 52249720,
+    "dwForceBackward": 52249792,
+    "dwForceForward": 52249804,
+    "dwForceJump": 86298244,
+    "dwForceLeft": 52249828,
+    "dwForceRight": 52249816,
+    "dwGameDir": 6477816,
+    "dwGameRulesProxy": 86770028,
+    "dwGetAllClasses": 14364588,
+    "dwGlobalVars": 5827816,
+    "dwGlowObjectManager": 86947096,
+    "dwInput": 85935368,
+    "dwInterfaceLinkList": 9724500,
+    "dwLocalPlayer": 14201564,
+    "dwMouseEnable": 14225024,
+    "dwMouseEnablePtr": 14224976,
+    "dwPlayerResource": 52242400,
+    "dwRadarBase": 85818524,
+    "dwSensitivity": 14224668,
+    "dwSensitivityPtr": 14224624,
+    "dwSetClanTag": 565664,
+    "dwViewMatrix": 81348644,
+    "dwWeaponTable": 85938120,
+    "dwWeaponTableIndex": 12892,
+    "dwYawPtr": 14224096,
+    "dwZoomSensitivityRatioPtr": 14245248,
+    "dwbSendPackets": 881754,
+    "dwppDirect3DDevice9": 684112,
+    "find_hud_element": 992011040,
+    "force_update_spectator_glow": 3856738,
+    "interface_engine_cvar": 256492,
+    "is_c4_owner": 3908656,
+    "m_bDormant": 237,
+    "m_flSpawnTime": 41840,
+    "m_pStudioHdr": 10572,
+    "m_pitchClassPtr": 85819192,
+    "m_yawClassPtr": 14224096,
+    "model_ambient_min": 5840988,
+    "set_abs_angles": 1964480,
+    "set_abs_origin": 1964032
+  },
+  "netvars": {
+    "cs_gamerules_data": 0,
+    "m_ArmorValue": 45944,
+    "m_Collision": 800,
+    "m_CollisionGroup": 1140,
+    "m_Local": 12220,
+    "m_MoveType": 604,
+    "m_OriginalOwnerXuidHigh": 12740,
+    "m_OriginalOwnerXuidLow": 12736,
+    "m_SurvivalGameRuleDecisionTypes": 4904,
+    "m_SurvivalRules": 3328,
+    "m_aimPunchAngle": 12332,
+    "m_aimPunchAngleVel": 12344,
+    "m_angEyeAnglesX": 45948,
+    "m_angEyeAnglesY": 45952,
+    "m_bBombPlanted": 2469,
+    "m_bFreezePeriod": 32,
+    "m_bGunGameImmunity": 14660,
+    "m_bHasDefuser": 45960,
+    "m_bHasHelmet": 45932,
+    "m_bInReload": 12965,
+    "m_bIsDefusing": 14640,
+    "m_bIsQueuedMatchmaking": 116,
+    "m_bIsScoped": 14632,
+    "m_bIsValveDS": 124,
+    "m_bSpotted": 2365,
+    "m_bSpottedByMask": 2432,
+    "m_bStartedArming": 13296,
+    "m_bUseCustomAutoExposureMax": 2521,
+    "m_bUseCustomAutoExposureMin": 2520,
+    "m_bUseCustomBloomScale": 2522,
+    "m_clrRender": 112,
+    "m_dwBoneMatrix": 9896,
+    "m_fAccuracyPenalty": 13104,
+    "m_fFlags": 260,
+    "m_flC4Blow": 10640,
+    "m_flCustomAutoExposureMax": 2528,
+    "m_flCustomAutoExposureMin": 2524,
+    "m_flCustomBloomScale": 2532,
+    "m_flDefuseCountDown": 10668,
+    "m_flDefuseLength": 10664,
+    "m_flFallbackWear": 12752,
+    "m_flFlashDuration": 42016,
+    "m_flFlashMaxAlpha": 42012,
+    "m_flLastBoneSetupTime": 10532,
+    "m_flLowerBodyYawTarget": 14992,
+    "m_flNextAttack": 11632,
+    "m_flNextPrimaryAttack": 12856,
+    "m_flSimulationTime": 616,
+    "m_flTimerLength": 10644,
+    "m_hActiveWeapon": 12024,
+    "m_hMyWeapons": 11768,
+    "m_hObserverTarget": 13196,
+    "m_hOwner": 10700,
+    "m_hOwnerEntity": 332,
+    "m_iAccountID": 12232,
+    "m_iClip1": 12900,
+    "m_iCompetitiveRanking": 6788,
+    "m_iCompetitiveWins": 7048,
+    "m_iCrosshairId": 46052,
+    "m_iEntityQuality": 12204,
+    "m_iFOV": 12772,
+    "m_iFOVStart": 12776,
+    "m_iGlowIndex": 42040,
+    "m_iHealth": 256,
+    "m_iItemDefinitionIndex": 12202,
+    "m_iItemIDHigh": 12224,
+    "m_iMostRecentModelBoneCounter": 9872,
+    "m_iObserverMode": 13176,
+    "m_iShotsFired": 41872,
+    "m_iState": 12888,
+    "m_iTeamNum": 244,
+    "m_lifeState": 607,
+    "m_nFallbackPaintKit": 12744,
+    "m_nFallbackSeed": 12748,
+    "m_nFallbackStatTrak": 12756,
+    "m_nForceBone": 9868,
+    "m_nTickBase": 13360,
+    "m_rgflCoordinateFrame": 1092,
+    "m_szCustomName": 12348,
+    "m_szLastPlaceName": 13748,
+    "m_thirdPersonViewAngles": 12760,
+    "m_vecOrigin": 312,
+    "m_vecVelocity": 276,
+    "m_vecViewOffset": 264,
+    "m_viewPunchAngle": 12320
+  }
+}
